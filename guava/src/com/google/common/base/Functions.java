@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Static utility methods pertaining to {@code com.google.common.base.Function} instances; see that
@@ -88,8 +88,7 @@ public final class Functions {
     INSTANCE;
 
     @Override
-    @Nullable
-    public Object apply(@Nullable Object o) {
+    public @Nullable Object apply(@Nullable Object o) {
       return o;
     }
 
@@ -114,6 +113,23 @@ public final class Functions {
    */
   public static <K, V> Function<K, V> forMap(Map<K, V> map) {
     return new FunctionForMapNoDefault<>(map);
+  }
+
+  /**
+   * Returns a function which performs a map lookup with a default value. The function created by
+   * this method returns {@code defaultValue} for all inputs that do not belong to the map's key
+   * set. See also {@link #forMap(Map)}, which throws an exception in this case.
+   *
+   * <p><b>Java 8 users:</b> you can just write the lambda expression {@code k ->
+   * map.getWithDefault(k, defaultValue)} instead.
+   *
+   * @param map source map that determines the function behavior
+   * @param defaultValue the value to return for inputs that aren't map keys
+   * @return function that returns {@code map.get(a)} when {@code a} is a key, or {@code
+   *     defaultValue} otherwise
+   */
+  public static <K, V> Function<K, V> forMap(Map<K, ? extends V> map, @Nullable V defaultValue) {
+    return new ForMapWithDefault<>(map, defaultValue);
   }
 
   private static class FunctionForMapNoDefault<K, V> implements Function<K, V>, Serializable {
@@ -152,26 +168,9 @@ public final class Functions {
     private static final long serialVersionUID = 0;
   }
 
-  /**
-   * Returns a function which performs a map lookup with a default value. The function created by
-   * this method returns {@code defaultValue} for all inputs that do not belong to the map's key
-   * set. See also {@link #forMap(Map)}, which throws an exception in this case.
-   *
-   * <p><b>Java 8 users:</b> you can just write the lambda expression {@code k ->
-   * map.getWithDefault(k, defaultValue)} instead.
-   *
-   * @param map source map that determines the function behavior
-   * @param defaultValue the value to return for inputs that aren't map keys
-   * @return function that returns {@code map.get(a)} when {@code a} is a key, or {@code
-   *     defaultValue} otherwise
-   */
-  public static <K, V> Function<K, V> forMap(Map<K, ? extends V> map, @Nullable V defaultValue) {
-    return new ForMapWithDefault<>(map, defaultValue);
-  }
-
   private static class ForMapWithDefault<K, V> implements Function<K, V>, Serializable {
     final Map<K, ? extends V> map;
-    final V defaultValue;
+    final @Nullable V defaultValue;
 
     ForMapWithDefault(Map<K, ? extends V> map, @Nullable V defaultValue) {
       this.map = checkNotNull(map);
@@ -320,7 +319,7 @@ public final class Functions {
   }
 
   private static class ConstantFunction<E> implements Function<Object, E>, Serializable {
-    private final E value;
+    private final @Nullable E value;
 
     public ConstantFunction(@Nullable E value) {
       this.value = value;

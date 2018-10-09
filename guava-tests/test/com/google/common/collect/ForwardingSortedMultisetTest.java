@@ -27,10 +27,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Tests for {@link ForwardingSortedMultiset}.

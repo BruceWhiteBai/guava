@@ -20,7 +20,7 @@ import com.google.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.SortedSet;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This class provides a skeletal implementation of the {@link SortedMultiset} interface.

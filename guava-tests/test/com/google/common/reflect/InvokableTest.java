@@ -29,8 +29,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
-import javax.annotation.Nullable;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Unit tests for {@link Invokable}.

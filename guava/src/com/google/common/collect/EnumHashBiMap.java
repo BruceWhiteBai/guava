@@ -27,7 +27,7 @@ import java.io.ObjectOutputStream;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@code BiMap} backed by an {@code EnumMap} instance for keys-to-values, and a {@code HashMap}

@@ -28,7 +28,7 @@ import com.google.common.base.Objects;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable value object capturing some basic statistics about a collection of paired double
@@ -213,7 +213,7 @@ public final class PairedStats implements Serializable {
    * guarantees {@code strictfp}-like semantics.)
    */
   @Override
-  public boolean equals(@Nullable Object obj) {
+  public boolean equals(@NullableDecl Object obj) {
     if (obj == null) {
       return false;
     }
@@ -221,10 +221,10 @@ public final class PairedStats implements Serializable {
       return false;
     }
     PairedStats other = (PairedStats) obj;
-    return (xStats.equals(other.xStats))
-        && (yStats.equals(other.yStats))
-        && (doubleToLongBits(sumOfProductsOfDeltas)
-            == doubleToLongBits(other.sumOfProductsOfDeltas));
+    return xStats.equals(other.xStats)
+        && yStats.equals(other.yStats)
+        && doubleToLongBits(sumOfProductsOfDeltas)
+            == doubleToLongBits(other.sumOfProductsOfDeltas);
   }
 
   /**

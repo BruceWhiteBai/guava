@@ -47,7 +47,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * The concurrent hash map implementation built by {@link MapMaker}.
@@ -339,7 +340,7 @@ class MapMakerInternalMap<
       implements InternalEntry<K, V, E> {
     final K key;
     final int hash;
-    final E next;
+    final @Nullable E next;
 
     AbstractStrongKeyEntry(K key, int hash, @Nullable E next) {
       this.key = key;
@@ -389,15 +390,14 @@ class MapMakerInternalMap<
   static final class StrongKeyStrongValueEntry<K, V>
       extends AbstractStrongKeyEntry<K, V, StrongKeyStrongValueEntry<K, V>>
       implements StrongValueEntry<K, V, StrongKeyStrongValueEntry<K, V>> {
-    @Nullable private volatile V value = null;
+    private volatile @Nullable V value = null;
 
     StrongKeyStrongValueEntry(K key, int hash, @Nullable StrongKeyStrongValueEntry<K, V> next) {
       super(key, hash, next);
     }
 
     @Override
-    @Nullable
-    public V getValue() {
+    public @Nullable V getValue() {
       return value;
     }
 
@@ -646,7 +646,7 @@ class MapMakerInternalMap<
   abstract static class AbstractWeakKeyEntry<K, V, E extends InternalEntry<K, V, E>>
       extends WeakReference<K> implements InternalEntry<K, V, E> {
     final int hash;
-    final E next;
+    final @Nullable E next;
 
     AbstractWeakKeyEntry(ReferenceQueue<K> queue, K key, int hash, @Nullable E next) {
       super(key, queue);
@@ -754,7 +754,7 @@ class MapMakerInternalMap<
   static final class WeakKeyStrongValueEntry<K, V>
       extends AbstractWeakKeyEntry<K, V, WeakKeyStrongValueEntry<K, V>>
       implements StrongValueEntry<K, V, WeakKeyStrongValueEntry<K, V>> {
-    @Nullable private volatile V value = null;
+    private volatile @Nullable V value = null;
 
     WeakKeyStrongValueEntry(
         ReferenceQueue<K> queue, K key, int hash, @Nullable WeakKeyStrongValueEntry<K, V> next) {
@@ -762,8 +762,7 @@ class MapMakerInternalMap<
     }
 
     @Override
-    @Nullable
-    public V getValue() {
+    public @Nullable V getValue() {
       return value;
     }
 
@@ -1194,7 +1193,7 @@ class MapMakerInternalMap<
     int threshold;
 
     /** The per-segment table. */
-    volatile AtomicReferenceArray<E> table;
+    @MonotonicNonNull volatile AtomicReferenceArray<E> table;
 
     /** The maximum size of this map. MapMaker.UNSET_INT if there is no maximum. */
     final int maxSegmentSize;
@@ -2185,7 +2184,7 @@ class MapMakerInternalMap<
     @Override
     public WeakValueReference<K, V, WeakKeyWeakValueEntry<K, V>> getWeakValueReferenceForTesting(
         InternalEntry<K, V, ?> e) {
-      return (castForTesting(e)).getValueReference();
+      return castForTesting(e).getValueReference();
     }
 
     @Override
@@ -2478,7 +2477,7 @@ class MapMakerInternalMap<
     }
   }
 
-  transient Set<K> keySet;
+  @MonotonicNonNull transient Set<K> keySet;
 
   @Override
   public Set<K> keySet() {
@@ -2486,7 +2485,7 @@ class MapMakerInternalMap<
     return (ks != null) ? ks : (keySet = new KeySet());
   }
 
-  transient Collection<V> values;
+  @MonotonicNonNull transient Collection<V> values;
 
   @Override
   public Collection<V> values() {
@@ -2494,7 +2493,7 @@ class MapMakerInternalMap<
     return (vs != null) ? vs : (values = new Values());
   }
 
-  transient Set<Entry<K, V>> entrySet;
+  @MonotonicNonNull transient Set<Entry<K, V>> entrySet;
 
   @Override
   public Set<Entry<K, V>> entrySet() {
@@ -2508,11 +2507,11 @@ class MapMakerInternalMap<
 
     int nextSegmentIndex;
     int nextTableIndex;
-    Segment<K, V, E, S> currentSegment;
-    AtomicReferenceArray<E> currentTable;
-    E nextEntry;
-    WriteThroughEntry nextExternal;
-    WriteThroughEntry lastReturned;
+    @MonotonicNonNull Segment<K, V, E, S> currentSegment;
+    @MonotonicNonNull AtomicReferenceArray<E> currentTable;
+    @Nullable E nextEntry;
+    @Nullable WriteThroughEntry nextExternal;
+    @Nullable WriteThroughEntry lastReturned;
 
     HashIterator() {
       nextSegmentIndex = segments.length - 1;

@@ -16,11 +16,11 @@ package com.google.common.base;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Legacy version of {@link java.util.function.Predicate}. Determines a true or false value for a
- * given input.
+ * Legacy version of {@link java.util.function.Predicate java.util.function.Predicate}. Determines a
+ * true or false value for a given input.
  *
  * <p>As this interface extends {@code java.util.function.Predicate}, an instance of this type may
  * be used as a {@code Predicate} directly. To use a {@code java.util.function.Predicate} where a

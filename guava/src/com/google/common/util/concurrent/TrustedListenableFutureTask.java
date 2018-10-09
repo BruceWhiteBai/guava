@@ -21,7 +21,7 @@ import com.google.j2objc.annotations.WeakOuter;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RunnableFuture;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link RunnableFuture} that also implements the {@link ListenableFuture} interface.
@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * performance reasons.
  */
 @GwtCompatible
-class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
+class TrustedListenableFutureTask<V> extends FluentFuture.TrustedFuture<V>
     implements RunnableFuture<V> {
 
   static <V> TrustedListenableFutureTask<V> create(AsyncCallable<V> callable) {
@@ -104,7 +104,7 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
     if (localTask != null) {
       return "task=[" + localTask + "]";
     }
-    return null;
+    return super.pendingToString();
   }
 
   @WeakOuter
@@ -135,7 +135,7 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }
@@ -159,7 +159,8 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
       return checkNotNull(
           callable.call(),
           "AsyncCallable.call returned null instead of a Future. "
-              + "Did you mean to return immediateFuture(null)?");
+              + "Did you mean to return immediateFuture(null)? %s",
+          callable);
     }
 
     @Override
@@ -172,7 +173,7 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }

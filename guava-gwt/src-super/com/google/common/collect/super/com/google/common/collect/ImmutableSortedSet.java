@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collector;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * GWT emulation of {@link com.google.common.collect.ImmutableSortedSet}.

@@ -24,7 +24,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.UnsignedInts;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An immutable hash code of arbitrary bit length.

@@ -18,7 +18,7 @@ package com.google.common.eventbus;
 
 import com.google.common.testing.AbstractPackageSanityTests;
 import java.lang.reflect.Method;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Basic sanity tests for the entire package.

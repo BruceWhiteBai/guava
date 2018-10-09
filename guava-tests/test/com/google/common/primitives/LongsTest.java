@@ -255,8 +255,7 @@ public class LongsTest extends TestCase {
     Random r = new Random(5);
     byte[] b = new byte[Longs.BYTES];
 
-    // total overkill, but, it takes 0.1 sec so why not...
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 1000; i++) {
       long num = r.nextLong();
       assertEquals(num, Longs.fromByteArray(Longs.toByteArray(num)));
 
@@ -327,15 +326,6 @@ public class LongsTest extends TestCase {
     testReverse(new long[] {-1, 1, -2, 2}, new long[] {2, -2, 1, -1});
   }
 
-  public void testReverseIndexed() {
-    testReverse(new long[] {}, 0, 0, new long[] {});
-    testReverse(new long[] {1}, 0, 1, new long[] {1});
-    testReverse(new long[] {1, 2}, 0, 2, new long[] {2, 1});
-    testReverse(new long[] {3, 1, 1}, 0, 2, new long[] {1, 3, 1});
-    testReverse(new long[] {3, 1, 1}, 0, 1, new long[] {3, 1, 1});
-    testReverse(new long[] {-1, 1, -2, 2}, 1, 3, new long[] {-1, -2, 1, 2});
-  }
-
   private static void testReverse(long[] input, long[] expectedOutput) {
     input = Arrays.copyOf(input, input.length);
     Longs.reverse(input);
@@ -348,21 +338,21 @@ public class LongsTest extends TestCase {
     assertTrue(Arrays.equals(expectedOutput, input));
   }
 
+  public void testReverseIndexed() {
+    testReverse(new long[] {}, 0, 0, new long[] {});
+    testReverse(new long[] {1}, 0, 1, new long[] {1});
+    testReverse(new long[] {1, 2}, 0, 2, new long[] {2, 1});
+    testReverse(new long[] {3, 1, 1}, 0, 2, new long[] {1, 3, 1});
+    testReverse(new long[] {3, 1, 1}, 0, 1, new long[] {3, 1, 1});
+    testReverse(new long[] {-1, 1, -2, 2}, 1, 3, new long[] {-1, -2, 1, 2});
+  }
+
   public void testSortDescending() {
     testSortDescending(new long[] {}, new long[] {});
     testSortDescending(new long[] {1}, new long[] {1});
     testSortDescending(new long[] {1, 2}, new long[] {2, 1});
     testSortDescending(new long[] {1, 3, 1}, new long[] {3, 1, 1});
     testSortDescending(new long[] {-1, 1, -2, 2}, new long[] {2, 1, -1, -2});
-  }
-
-  public void testSortDescendingIndexed() {
-    testSortDescending(new long[] {}, 0, 0, new long[] {});
-    testSortDescending(new long[] {1}, 0, 1, new long[] {1});
-    testSortDescending(new long[] {1, 2}, 0, 2, new long[] {2, 1});
-    testSortDescending(new long[] {1, 3, 1}, 0, 2, new long[] {3, 1, 1});
-    testSortDescending(new long[] {1, 3, 1}, 0, 1, new long[] {1, 3, 1});
-    testSortDescending(new long[] {-1, -2, 1, 2}, 1, 3, new long[] {-1, 1, -2, 2});
   }
 
   private static void testSortDescending(long[] input, long[] expectedOutput) {
@@ -376,6 +366,15 @@ public class LongsTest extends TestCase {
     input = Arrays.copyOf(input, input.length);
     Longs.sortDescending(input, fromIndex, toIndex);
     assertTrue(Arrays.equals(expectedOutput, input));
+  }
+
+  public void testSortDescendingIndexed() {
+    testSortDescending(new long[] {}, 0, 0, new long[] {});
+    testSortDescending(new long[] {1}, 0, 1, new long[] {1});
+    testSortDescending(new long[] {1, 2}, 0, 2, new long[] {2, 1});
+    testSortDescending(new long[] {1, 3, 1}, 0, 2, new long[] {3, 1, 1});
+    testSortDescending(new long[] {1, 3, 1}, 0, 1, new long[] {1, 3, 1});
+    testSortDescending(new long[] {-1, -2, 1, 2}, 1, 3, new long[] {-1, 1, -2, 2});
   }
 
   @GwtIncompatible // SerializableTester

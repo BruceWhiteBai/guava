@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.GwtCompatible;
 import java.io.Serializable;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Utility class for converting between various ASCII case formats. Behavior is undefined for
@@ -202,7 +202,7 @@ public enum CaseFormat {
   }
 
   private static String firstCharOnlyToUpper(String word) {
-    return (word.isEmpty())
+    return word.isEmpty()
         ? word
         : Ascii.toUpperCase(word.charAt(0)) + Ascii.toLowerCase(word.substring(1));
   }

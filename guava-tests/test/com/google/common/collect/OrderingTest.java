@@ -40,8 +40,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.RandomAccess;
-import javax.annotation.Nullable;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Unit tests for {@code Ordering}.

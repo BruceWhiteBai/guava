@@ -22,7 +22,8 @@ import com.google.errorprone.annotations.ForOverride;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.Serializable;
 import java.util.Iterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A function from {@code A} to {@code B} with an associated <i>reverse</i> function from {@code B}
@@ -117,7 +118,7 @@ public abstract class Converter<A, B> implements Function<A, B> {
   private final boolean handleNullAutomatically;
 
   // We lazily cache the reverse view to avoid allocating on every call to reverse().
-  @LazyInit private transient Converter<B, A> reverse;
+  @LazyInit private transient @MonotonicNonNull Converter<B, A> reverse;
 
   /** Constructor for use by subclasses. */
   protected Converter() {
@@ -163,9 +164,8 @@ public abstract class Converter<A, B> implements Function<A, B> {
    *
    * @return the converted value; is null <i>if and only if</i> {@code a} is null
    */
-  @Nullable
   @CanIgnoreReturnValue
-  public final B convert(@Nullable A a) {
+  public final @Nullable B convert(@Nullable A a) {
     return correctedDoForward(a);
   }
 
@@ -385,9 +385,8 @@ public abstract class Converter<A, B> implements Function<A, B> {
    */
   @Deprecated
   @Override
-  @Nullable
   @CanIgnoreReturnValue
-  public final B apply(@Nullable A a) {
+  public final @Nullable B apply(@Nullable A a) {
     return convert(a);
   }
 

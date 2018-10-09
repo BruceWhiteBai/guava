@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Helper class for creating {@link CacheBuilder} instances with all combinations of several sets of

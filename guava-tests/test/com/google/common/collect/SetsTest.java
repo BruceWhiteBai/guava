@@ -73,10 +73,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Unit test for {@code Sets}.
@@ -924,6 +924,12 @@ public class SetsTest extends TestCase {
               newHashSet(
                   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
                   'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5'));
+      fail();
+    } catch (IllegalArgumentException expected) {
+    }
+
+    try {
+      Set<Set<Integer>> unused = powerSet(ContiguousSet.closed(0, Integer.MAX_VALUE / 2));
       fail();
     } catch (IllegalArgumentException expected) {
     }

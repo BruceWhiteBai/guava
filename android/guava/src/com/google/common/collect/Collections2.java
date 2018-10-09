@@ -35,8 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Provides static methods for working with {@code Collection} instances.
@@ -96,7 +95,7 @@ public final class Collections2 {
    * Delegates to {@link Collection#contains}. Returns {@code false} if the {@code contains} method
    * throws a {@code ClassCastException} or {@code NullPointerException}.
    */
-  static boolean safeContains(Collection<?> collection, @Nullable Object object) {
+  static boolean safeContains(Collection<?> collection, @NullableDecl Object object) {
     checkNotNull(collection);
     try {
       return collection.contains(object);
@@ -109,7 +108,7 @@ public final class Collections2 {
    * Delegates to {@link Collection#remove}. Returns {@code false} if the {@code remove} method
    * throws a {@code ClassCastException} or {@code NullPointerException}.
    */
-  static boolean safeRemove(Collection<?> collection, @Nullable Object object) {
+  static boolean safeRemove(Collection<?> collection, @NullableDecl Object object) {
     checkNotNull(collection);
     try {
       return collection.remove(object);
@@ -152,7 +151,7 @@ public final class Collections2 {
     }
 
     @Override
-    public boolean contains(@Nullable Object element) {
+    public boolean contains(@NullableDecl Object element) {
       if (safeContains(unfiltered, element)) {
         @SuppressWarnings("unchecked") // element is in unfiltered, so it must be an E
         E e = (E) element;
@@ -472,7 +471,7 @@ public final class Collections2 {
     }
 
     @Override
-    public boolean contains(@Nullable Object obj) {
+    public boolean contains(@NullableDecl Object obj) {
       if (obj instanceof List) {
         List<?> list = (List<?>) obj;
         return isPermutation(inputList, list);
@@ -487,8 +486,7 @@ public final class Collections2 {
   }
 
   private static final class OrderedPermutationIterator<E> extends AbstractIterator<List<E>> {
-
-    List<E> nextPermutation;
+    @NullableDecl List<E> nextPermutation;
     final Comparator<? super E> comparator;
 
     OrderedPermutationIterator(List<E> list, Comparator<? super E> comparator) {
@@ -584,7 +582,7 @@ public final class Collections2 {
     }
 
     @Override
-    public boolean contains(@Nullable Object obj) {
+    public boolean contains(@NullableDecl Object obj) {
       if (obj instanceof List) {
         List<?> list = (List<?>) obj;
         return isPermutation(inputList, list);
@@ -663,14 +661,27 @@ public final class Collections2 {
 
   /** Returns {@code true} if the second list is a permutation of the first. */
   private static boolean isPermutation(List<?> first, List<?> second) {
-    return first.size() == second.size() && counts(first).equals(counts(second));
+    if (first.size() != second.size()) {
+      return false;
+    }
+    ObjectCountHashMap<?> firstCounts = counts(first);
+    ObjectCountHashMap<?> secondCounts = counts(second);
+    if (first.size() != second.size()) {
+      return false;
+    }
+    for (int i = 0; i < first.size(); i++) {
+      if (firstCounts.getValue(i) != secondCounts.get(firstCounts.getKey(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  private static <E> Set<Multiset.Entry<E>> counts(Collection<E> collection) {
-    AbstractObjectCountMap<E> map = new ObjectCountHashMap<>();
+  private static <E> ObjectCountHashMap<E> counts(Collection<E> collection) {
+    ObjectCountHashMap<E> map = new ObjectCountHashMap<>();
     for (E e : collection) {
       map.put(e, map.get(e) + 1);
     }
-    return map.entrySet();
+    return map;
   }
 }

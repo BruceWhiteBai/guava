@@ -33,9 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.RandomAccess;
-import java.util.regex.Pattern;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Static utility methods pertaining to {@code double} primitives, that are not already found in
@@ -595,7 +593,7 @@ public final class Doubles {
     }
 
     @Override
-    public boolean equals(@Nullable Object object) {
+    public boolean equals(@NullableDecl Object object) {
       if (object == this) {
         return true;
       }
@@ -647,16 +645,32 @@ public final class Doubles {
    * that pass this regex are valid -- only a performance hit is incurred, not a semantics bug.
    */
   @GwtIncompatible // regular expressions
-  static final Pattern FLOATING_POINT_PATTERN = fpPattern();
+  static final
+  java.util.regex.Pattern
+      FLOATING_POINT_PATTERN = fpPattern();
 
   @GwtIncompatible // regular expressions
-  private static Pattern fpPattern() {
-    String decimal = "(?:\\d++(?:\\.\\d*+)?|\\.\\d++)";
-    String completeDec = decimal + "(?:[eE][+-]?\\d++)?[fFdD]?";
-    String hex = "(?:\\p{XDigit}++(?:\\.\\p{XDigit}*+)?|\\.\\p{XDigit}++)";
-    String completeHex = "0[xX]" + hex + "[pP][+-]?\\d++[fFdD]?";
+  private static
+  java.util.regex.Pattern
+      fpPattern() {
+    /*
+     * We use # instead of * for possessive quantifiers. This lets us strip them out when building
+     * the regex for RE2 (which doesn't support them) but leave them in when building it for
+     * java.util.regex (where we want them in order to avoid catastrophic backtracking).
+     */
+    String decimal = "(?:\\d+#(?:\\.\\d*#)?|\\.\\d+#)";
+    String completeDec = decimal + "(?:[eE][+-]?\\d+#)?[fFdD]?";
+    String hex = "(?:[0-9a-fA-F]+#(?:\\.[0-9a-fA-F]*#)?|\\.[0-9a-fA-F]+#)";
+    String completeHex = "0[xX]" + hex + "[pP][+-]?\\d+#[fFdD]?";
     String fpPattern = "[+-]?(?:NaN|Infinity|" + completeDec + "|" + completeHex + ")";
-    return Pattern.compile(fpPattern);
+    fpPattern =
+        fpPattern.replace(
+            "#",
+            "+"
+            );
+    return
+    java.util.regex.Pattern
+        .compile(fpPattern);
   }
 
   /**
@@ -676,9 +690,8 @@ public final class Doubles {
    * @since 14.0
    */
   @Beta
-  @Nullable
-  @CheckForNull
   @GwtIncompatible // regular expressions
+  @NullableDecl
   public static Double tryParse(String string) {
     if (FLOATING_POINT_PATTERN.matcher(string).matches()) {
       // TODO(lowasser): could be potentially optimized, but only with

@@ -24,7 +24,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable representation of a host and port.
@@ -277,22 +277,20 @@ public final class HostAndPort implements Serializable {
   }
 
   @Override
-  public boolean equals(@Nullable Object other) {
+  public boolean equals(@NullableDecl Object other) {
     if (this == other) {
       return true;
     }
     if (other instanceof HostAndPort) {
       HostAndPort that = (HostAndPort) other;
-      return Objects.equal(this.host, that.host)
-          && this.port == that.port
-          && this.hasBracketlessColons == that.hasBracketlessColons;
+      return Objects.equal(this.host, that.host) && this.port == that.port;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(host, port, hasBracketlessColons);
+    return Objects.hashCode(host, port);
   }
 
   /** Rebuild the host:port string, including brackets if necessary. */

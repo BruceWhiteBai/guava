@@ -33,8 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -42,7 +40,7 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of {@code Multimap} that does not allow duplicate key-value entries and that
@@ -157,11 +155,11 @@ public final class LinkedHashMultimap<K, V>
 
     @Nullable ValueEntry<K, V> nextInValueBucket;
 
-    ValueSetLink<K, V> predecessorInValueSet;
-    ValueSetLink<K, V> successorInValueSet;
+    @Nullable ValueSetLink<K, V> predecessorInValueSet;
+    @Nullable ValueSetLink<K, V> successorInValueSet;
 
-    ValueEntry<K, V> predecessorInMultimap;
-    ValueEntry<K, V> successorInMultimap;
+    @Nullable ValueEntry<K, V> predecessorInMultimap;
+    @Nullable ValueEntry<K, V> successorInMultimap;
 
     ValueEntry(
         @Nullable K key,
@@ -222,7 +220,7 @@ public final class LinkedHashMultimap<K, V>
   private transient ValueEntry<K, V> multimapHeaderEntry;
 
   private LinkedHashMultimap(int keyCapacity, int valueSetCapacity) {
-    super(new LinkedHashMap<K, Collection<V>>(keyCapacity));
+    super(Platform.<K, Collection<V>>newLinkedHashMapWithExpectedSize(keyCapacity));
     checkNonnegative(valueSetCapacity, "expectedValuesPerKey");
 
     this.valueSetCapacity = valueSetCapacity;
@@ -239,7 +237,7 @@ public final class LinkedHashMultimap<K, V>
    */
   @Override
   Set<V> createCollection() {
-    return new LinkedHashSet<V>(valueSetCapacity);
+    return Platform.newLinkedHashSetWithExpectedSize(valueSetCapacity);
   }
 
   /**
@@ -370,7 +368,7 @@ public final class LinkedHashMultimap<K, V>
     public Iterator<V> iterator() {
       return new Iterator<V>() {
         ValueSetLink<K, V> nextEntry = firstEntry;
-        ValueEntry<K, V> toRemove;
+        @Nullable ValueEntry<K, V> toRemove;
         int expectedModCount = modCount;
 
         private void checkForComodification() {
@@ -521,7 +519,7 @@ public final class LinkedHashMultimap<K, V>
   Iterator<Entry<K, V>> entryIterator() {
     return new Iterator<Entry<K, V>>() {
       ValueEntry<K, V> nextEntry = multimapHeaderEntry.successorInMultimap;
-      ValueEntry<K, V> toRemove;
+      @Nullable ValueEntry<K, V> toRemove;
 
       @Override
       public boolean hasNext() {
@@ -594,7 +592,7 @@ public final class LinkedHashMultimap<K, V>
     succeedsInMultimap(multimapHeaderEntry, multimapHeaderEntry);
     valueSetCapacity = DEFAULT_VALUE_SET_CAPACITY;
     int distinctKeys = stream.readInt();
-    Map<K, Collection<V>> map = new LinkedHashMap<>();
+    Map<K, Collection<V>> map = Platform.newLinkedHashMapWithExpectedSize(12);
     for (int i = 0; i < distinctKeys; i++) {
       @SuppressWarnings("unchecked")
       K key = (K) stream.readObject();

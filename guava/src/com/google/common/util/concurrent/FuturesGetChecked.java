@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 
 /** Static methods used to implement {@link Futures#getChecked(Future, Class)}. */
@@ -257,8 +257,7 @@ final class FuturesGetChecked {
               })
           .reverse();
 
-  @Nullable
-  private static <X> X newFromConstructor(Constructor<X> constructor, Throwable cause) {
+  private static <X> @Nullable X newFromConstructor(Constructor<X> constructor, Throwable cause) {
     Class<?>[] paramTypes = constructor.getParameterTypes();
     Object[] params = new Object[paramTypes.length];
     for (int i = 0; i < paramTypes.length; i++) {

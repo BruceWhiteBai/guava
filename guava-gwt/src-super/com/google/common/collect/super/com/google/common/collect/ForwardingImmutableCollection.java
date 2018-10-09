@@ -17,7 +17,7 @@
 package com.google.common.collect;
 
 import java.util.Collection;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A GWT-only class only used by GWT emulations. It is used to consolidate the definitions of method

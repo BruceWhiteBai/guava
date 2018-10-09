@@ -16,6 +16,7 @@
 
 package com.google.common.collect;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkPositionIndex;
@@ -37,7 +38,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A {@link List} whose contents will never change, with many other important properties detailed at
@@ -175,12 +176,17 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
   /**
    * Returns an immutable list containing the given elements, in order.
    *
+   * <p>The array {@code others} must not be longer than {@code Integer.MAX_VALUE - 12}.
+   *
    * @throws NullPointerException if any element is null
    * @since 3.0 (source-compatible since 2.0)
    */
   @SafeVarargs // For Eclipse. For internal javac we have disabled this pointless type of warning.
   public static <E> ImmutableList<E> of(
       E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9, E e10, E e11, E e12, E... others) {
+    checkArgument(
+        others.length <= Integer.MAX_VALUE - 12,
+        "the total number of elements must fit in an int");
     Object[] array = new Object[12 + others.length];
     array[0] = e1;
     array[1] = e2;
@@ -352,10 +358,6 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
     return listIterator(0);
   }
 
-  /** A singleton implementation of iterator() for the empty ImmutableList. */
-  private static final UnmodifiableListIterator<Object> EMPTY_ITR =
-      new Itr<Object>(RegularImmutableList.EMPTY, 0);
-
   @SuppressWarnings("unchecked")
   @Override
   public UnmodifiableListIterator<E> listIterator(int index) {
@@ -366,6 +368,10 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
       return new Itr<E>(this, index);
     }
   }
+
+  /** A singleton implementation of iterator() for the empty ImmutableList. */
+  private static final UnmodifiableListIterator<Object> EMPTY_ITR =
+      new Itr<Object>(RegularImmutableList.EMPTY, 0);
 
   static class Itr<E> extends AbstractIndexedListIterator<E> {
     private final ImmutableList<E> list;
@@ -382,17 +388,17 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
   }
 
   @Override
-  public int indexOf(@Nullable Object object) {
+  public int indexOf(@NullableDecl Object object) {
     return (object == null) ? -1 : Lists.indexOfImpl(this, object);
   }
 
   @Override
-  public int lastIndexOf(@Nullable Object object) {
+  public int lastIndexOf(@NullableDecl Object object) {
     return (object == null) ? -1 : Lists.lastIndexOfImpl(this, object);
   }
 
   @Override
-  public boolean contains(@Nullable Object object) {
+  public boolean contains(@NullableDecl Object object) {
     return indexOf(object) >= 0;
   }
 
@@ -436,6 +442,21 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
     @Override
     public int size() {
       return length;
+    }
+
+    @Override
+    Object[] internalArray() {
+      return ImmutableList.this.internalArray();
+    }
+
+    @Override
+    int internalArrayStart() {
+      return ImmutableList.this.internalArrayStart() + offset;
+    }
+
+    @Override
+    int internalArrayEnd() {
+      return ImmutableList.this.internalArrayStart() + offset + length;
     }
 
     @Override
@@ -559,18 +580,18 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
     }
 
     @Override
-    public boolean contains(@Nullable Object object) {
+    public boolean contains(@NullableDecl Object object) {
       return forwardList.contains(object);
     }
 
     @Override
-    public int indexOf(@Nullable Object object) {
+    public int indexOf(@NullableDecl Object object) {
       int index = forwardList.lastIndexOf(object);
       return (index >= 0) ? reverseIndex(index) : -1;
     }
 
     @Override
-    public int lastIndexOf(@Nullable Object object) {
+    public int lastIndexOf(@NullableDecl Object object) {
       int index = forwardList.indexOf(object);
       return (index >= 0) ? reverseIndex(index) : -1;
     }
@@ -599,7 +620,7 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
   }
 
   @Override
-  public boolean equals(@Nullable Object obj) {
+  public boolean equals(@NullableDecl Object obj) {
     return Lists.equalsImpl(this, obj);
   }
 
@@ -725,8 +746,8 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
      */
     @CanIgnoreReturnValue
     @Override
-    public Builder<E> addAll(Iterable<? extends E> elements) {
-      super.addAll(elements);
+    public Builder<E> add(E... elements) {
+      super.add(elements);
       return this;
     }
 
@@ -739,8 +760,8 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
      */
     @CanIgnoreReturnValue
     @Override
-    public Builder<E> add(E... elements) {
-      super.add(elements);
+    public Builder<E> addAll(Iterable<? extends E> elements) {
+      super.addAll(elements);
       return this;
     }
 

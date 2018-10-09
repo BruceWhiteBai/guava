@@ -33,7 +33,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A {@link BiMap} backed by two hash tables. This implementation allows null keys and values. A
@@ -95,9 +96,9 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   /** Maps an "entry" to the "entry" that follows it in its bucket. */
   private transient int[] nextInBucketVToK;
   /** The "entry" of the first element in insertion order. */
-  private transient int firstInInsertionOrder;
+  @NullableDecl private transient int firstInInsertionOrder;
   /** The "entry" of the last element in insertion order. */
-  private transient int lastInInsertionOrder;
+  @NullableDecl private transient int lastInInsertionOrder;
   /** Maps an "entry" to the "entry" that precedes it in insertion order. */
   private transient int[] prevInInsertionOrder;
   /** Maps an "entry" to the "entry" that follows it in insertion order. */
@@ -192,19 +193,19 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   }
 
   /** Given a key, returns the index of the entry in the tables, or ABSENT if not found. */
-  int findEntryByKey(@Nullable Object key) {
+  int findEntryByKey(@NullableDecl Object key) {
     return findEntryByKey(key, Hashing.smearedHash(key));
   }
 
   /**
    * Given a key and its hash, returns the index of the entry in the tables, or ABSENT if not found.
    */
-  int findEntryByKey(@Nullable Object key, int keyHash) {
+  int findEntryByKey(@NullableDecl Object key, int keyHash) {
     return findEntry(key, keyHash, hashTableKToV, nextInBucketKToV, keys);
   }
 
   /** Given a value, returns the index of the entry in the tables, or ABSENT if not found. */
-  int findEntryByValue(@Nullable Object value) {
+  int findEntryByValue(@NullableDecl Object value) {
     return findEntryByValue(value, Hashing.smearedHash(value));
   }
 
@@ -212,12 +213,12 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
    * Given a value and its hash, returns the index of the entry in the tables, or ABSENT if not
    * found.
    */
-  int findEntryByValue(@Nullable Object value, int valueHash) {
+  int findEntryByValue(@NullableDecl Object value, int valueHash) {
     return findEntry(value, valueHash, hashTableVToK, nextInBucketVToK, values);
   }
 
   int findEntry(
-      @Nullable Object o, int oHash, int[] hashTable, int[] nextInBucket, Object[] array) {
+      @NullableDecl Object o, int oHash, int[] hashTable, int[] nextInBucket, Object[] array) {
     for (int entry = hashTable[bucket(oHash)]; entry != ABSENT; entry = nextInBucket[entry]) {
       if (Objects.equal(array[entry], o)) {
         return entry;
@@ -227,43 +228,36 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   }
 
   @Override
-  public boolean containsKey(@Nullable Object key) {
+  public boolean containsKey(@NullableDecl Object key) {
     return findEntryByKey(key) != ABSENT;
   }
 
   @Override
-  public boolean containsValue(@Nullable Object value) {
+  public boolean containsValue(@NullableDecl Object value) {
     return findEntryByValue(value) != ABSENT;
   }
 
   @Override
-  @Nullable
-  public V get(@Nullable Object key) {
+  @NullableDecl
+  public V get(@NullableDecl Object key) {
     int entry = findEntryByKey(key);
     return (entry == ABSENT) ? null : values[entry];
   }
 
-  @Nullable
-  K getInverse(@Nullable Object value) {
+  @NullableDecl
+  K getInverse(@NullableDecl Object value) {
     int entry = findEntryByValue(value);
     return (entry == ABSENT) ? null : keys[entry];
   }
 
   @Override
   @CanIgnoreReturnValue
-  public V put(@Nullable K key, @Nullable V value) {
+  public V put(@NullableDecl K key, @NullableDecl V value) {
     return put(key, value, false);
   }
 
-  @Override
-  @Nullable
-  @CanIgnoreReturnValue
-  public V forcePut(@Nullable K key, @Nullable V value) {
-    return put(key, value, true);
-  }
-
-  @Nullable
-  V put(@Nullable K key, @Nullable V value, boolean force) {
+  @NullableDecl
+  V put(@NullableDecl K key, @NullableDecl V value, boolean force) {
     int keyHash = Hashing.smearedHash(key);
     int entryForKey = findEntryByKey(key, keyHash);
     if (entryForKey != ABSENT) {
@@ -300,8 +294,15 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     return null;
   }
 
-  @Nullable
-  K putInverse(@Nullable V value, @Nullable K key, boolean force) {
+  @Override
+  @CanIgnoreReturnValue
+  @NullableDecl
+  public V forcePut(@NullableDecl K key, @NullableDecl V value) {
+    return put(key, value, true);
+  }
+
+  @NullableDecl
+  K putInverse(@NullableDecl V value, @NullableDecl K key, boolean force) {
     int valueHash = Hashing.smearedHash(value);
     int entryForValue = findEntryByValue(value, valueHash);
     if (entryForValue != ABSENT) {
@@ -446,7 +447,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
    * Updates the specified entry to point to the new value: removes the old value from the V-to-K
    * mapping and puts the new one in. The entry does not move in the insertion order of the bimap.
    */
-  private void replaceValueInEntry(int entry, @Nullable V newValue, boolean force) {
+  private void replaceValueInEntry(int entry, @NullableDecl V newValue, boolean force) {
     checkArgument(entry != ABSENT);
     int newValueHash = Hashing.smearedHash(newValue);
     int newValueIndex = findEntryByValue(newValue, newValueHash);
@@ -471,7 +472,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
    * mapping and puts the new one in. The entry is moved to the end of the insertion order, or to
    * the position of the new key if it was previously present.
    */
-  private void replaceKeyInEntry(int entry, @Nullable K newKey, boolean force) {
+  private void replaceKeyInEntry(int entry, @NullableDecl K newKey, boolean force) {
     checkArgument(entry != ABSENT);
     int newKeyHash = Hashing.smearedHash(newKey);
     int newKeyIndex = findEntryByKey(newKey, newKeyHash);
@@ -516,28 +517,28 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   }
 
   @Override
-  @Nullable
   @CanIgnoreReturnValue
-  public V remove(@Nullable Object key) {
+  @NullableDecl
+  public V remove(@NullableDecl Object key) {
     int keyHash = Hashing.smearedHash(key);
     int entry = findEntryByKey(key, keyHash);
     if (entry == ABSENT) {
       return null;
     } else {
-      @Nullable V value = values[entry];
+      @NullableDecl V value = values[entry];
       removeEntryKeyHashKnown(entry, keyHash);
       return value;
     }
   }
 
-  @Nullable
-  K removeInverse(@Nullable Object value) {
+  @NullableDecl
+  K removeInverse(@NullableDecl Object value) {
     int valueHash = Hashing.smearedHash(value);
     int entry = findEntryByValue(value, valueHash);
     if (entry == ABSENT) {
       return null;
     } else {
-      @Nullable K key = keys[entry];
+      @NullableDecl K key = keys[entry];
       removeEntryValueHashKnown(entry, valueHash);
       return key;
     }
@@ -546,16 +547,6 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   /** Removes the entry at the specified index with no additional data. */
   void removeEntry(int entry) {
     removeEntryKeyHashKnown(entry, Hashing.smearedHash(keys[entry]));
-  }
-
-  /** Removes the entry at the specified index, given the hash of its key. */
-  void removeEntryKeyHashKnown(int entry, int keyHash) {
-    removeEntry(entry, keyHash, Hashing.smearedHash(values[entry]));
-  }
-
-  /** Removes the entry at the specified index, given the hash of its value. */
-  void removeEntryValueHashKnown(int entry, int valueHash) {
-    removeEntry(entry, Hashing.smearedHash(keys[entry]), valueHash);
   }
 
   /** Removes the entry at the specified index, given the hash of its key and value. */
@@ -573,6 +564,16 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     values[size - 1] = null;
     size--;
     modCount++;
+  }
+
+  /** Removes the entry at the specified index, given the hash of its key. */
+  void removeEntryKeyHashKnown(int entry, int keyHash) {
+    removeEntry(entry, keyHash, Hashing.smearedHash(values[entry]));
+  }
+
+  /** Removes the entry at the specified index, given the hash of its value. */
+  void removeEntryValueHashKnown(int entry, int valueHash) {
+    removeEntry(entry, Hashing.smearedHash(keys[entry]), valueHash);
   }
 
   /**
@@ -652,22 +653,28 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   }
 
   /** Shared supertype of keySet, values, entrySet, and inverse.entrySet. */
-  abstract class View<T> extends AbstractSet<T> {
+  abstract static class View<K, V, T> extends AbstractSet<T> {
+    final HashBiMap<K, V> biMap;
+
+    View(HashBiMap<K, V> biMap) {
+      this.biMap = biMap;
+    }
+
     abstract T forEntry(int entry);
 
     @Override
     public Iterator<T> iterator() {
       return new Iterator<T>() {
-        private int index = firstInInsertionOrder;
+        private int index = biMap.firstInInsertionOrder;
         private int indexToRemove = ABSENT;
-        private int expectedModCount = modCount;
+        private int expectedModCount = biMap.modCount;
 
         // Calls to setValue on inverse entries can move already-visited entries to the end.
         // Make sure we don't visit those.
-        private int remaining = size;
+        private int remaining = biMap.size;
 
         private void checkForComodification() {
-          if (modCount != expectedModCount) {
+          if (biMap.modCount != expectedModCount) {
             throw new ConcurrentModificationException();
           }
         }
@@ -685,7 +692,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
           }
           T result = forEntry(index);
           indexToRemove = index;
-          index = nextInInsertionOrder[index];
+          index = biMap.nextInInsertionOrder[index];
           remaining--;
           return result;
         }
@@ -694,24 +701,24 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
         public void remove() {
           checkForComodification();
           CollectPreconditions.checkRemove(indexToRemove != ABSENT);
-          removeEntry(indexToRemove);
-          if (index == size) {
+          biMap.removeEntry(indexToRemove);
+          if (index == biMap.size) {
             index = indexToRemove;
           }
           indexToRemove = ABSENT;
-          expectedModCount = modCount;
+          expectedModCount = biMap.modCount;
         }
       };
     }
 
     @Override
     public int size() {
-      return size;
+      return biMap.size;
     }
 
     @Override
     public void clear() {
-      HashBiMap.this.clear();
+      biMap.clear();
     }
   }
 
@@ -723,19 +730,23 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     return (result == null) ? keySet = new KeySet() : result;
   }
 
-  final class KeySet extends View<K> {
+  final class KeySet extends View<K, V, K> {
+    KeySet() {
+      super(HashBiMap.this);
+    }
+
     @Override
     K forEntry(int entry) {
       return keys[entry];
     }
 
     @Override
-    public boolean contains(@Nullable Object o) {
+    public boolean contains(@NullableDecl Object o) {
       return HashBiMap.this.containsKey(o);
     }
 
     @Override
-    public boolean remove(@Nullable Object o) {
+    public boolean remove(@NullableDecl Object o) {
       int oHash = Hashing.smearedHash(o);
       int entry = findEntryByKey(o, oHash);
       if (entry != ABSENT) {
@@ -755,19 +766,23 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     return (result == null) ? valueSet = new ValueSet() : result;
   }
 
-  final class ValueSet extends View<V> {
+  final class ValueSet extends View<K, V, V> {
+    ValueSet() {
+      super(HashBiMap.this);
+    }
+
     @Override
     V forEntry(int entry) {
       return values[entry];
     }
 
     @Override
-    public boolean contains(@Nullable Object o) {
+    public boolean contains(@NullableDecl Object o) {
       return HashBiMap.this.containsValue(o);
     }
 
     @Override
-    public boolean remove(@Nullable Object o) {
+    public boolean remove(@NullableDecl Object o) {
       int oHash = Hashing.smearedHash(o);
       int entry = findEntryByValue(o, oHash);
       if (entry != ABSENT) {
@@ -787,13 +802,17 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     return (result == null) ? entrySet = new EntrySet() : result;
   }
 
-  final class EntrySet extends View<Entry<K, V>> {
+  final class EntrySet extends View<K, V, Entry<K, V>> {
+    EntrySet() {
+      super(HashBiMap.this);
+    }
+
     @Override
-    public boolean contains(@Nullable Object o) {
+    public boolean contains(@NullableDecl Object o) {
       if (o instanceof Entry) {
         Entry<?, ?> e = (Entry<?, ?>) o;
-        @Nullable Object k = e.getKey();
-        @Nullable Object v = e.getValue();
+        @NullableDecl Object k = e.getKey();
+        @NullableDecl Object v = e.getValue();
         int eIndex = findEntryByKey(k);
         return eIndex != ABSENT && Objects.equal(v, values[eIndex]);
       }
@@ -802,11 +821,11 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
 
     @Override
     @CanIgnoreReturnValue
-    public boolean remove(@Nullable Object o) {
+    public boolean remove(@NullableDecl Object o) {
       if (o instanceof Entry) {
         Entry<?, ?> e = (Entry<?, ?>) o;
-        @Nullable Object k = e.getKey();
-        @Nullable Object v = e.getValue();
+        @NullableDecl Object k = e.getKey();
+        @NullableDecl Object v = e.getValue();
         int kHash = Hashing.smearedHash(k);
         int eIndex = findEntryByKey(k, kHash);
         if (eIndex != ABSENT && Objects.equal(v, values[eIndex])) {
@@ -829,7 +848,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
    * work if the key has not moved.
    */
   final class EntryForKey extends AbstractMapEntry<K, V> {
-    @Nullable final K key;
+    @NullableDecl final K key;
     int index;
 
     EntryForKey(int index) {
@@ -849,7 +868,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     }
 
     @Override
-    @Nullable
+    @NullableDecl
     public V getValue() {
       updateIndex();
       return (index == ABSENT) ? null : values[index];
@@ -870,7 +889,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     }
   }
 
-  @RetainedWith private transient BiMap<V, K> inverse;
+  @MonotonicNonNullDecl @RetainedWith private transient BiMap<V, K> inverse;
 
   @Override
   public BiMap<V, K> inverse() {
@@ -891,32 +910,32 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     }
 
     @Override
-    public boolean containsKey(@Nullable Object key) {
+    public boolean containsKey(@NullableDecl Object key) {
       return forward.containsValue(key);
     }
 
     @Override
-    @Nullable
-    public K get(@Nullable Object key) {
+    @NullableDecl
+    public K get(@NullableDecl Object key) {
       return forward.getInverse(key);
     }
 
     @Override
-    public boolean containsValue(@Nullable Object value) {
+    public boolean containsValue(@NullableDecl Object value) {
       return forward.containsKey(value);
     }
 
     @Override
-    @Nullable
     @CanIgnoreReturnValue
-    public K put(@Nullable V value, @Nullable K key) {
+    @NullableDecl
+    public K put(@NullableDecl V value, @NullableDecl K key) {
       return forward.putInverse(value, key, false);
     }
 
     @Override
-    @Nullable
     @CanIgnoreReturnValue
-    public K forcePut(@Nullable V value, @Nullable K key) {
+    @NullableDecl
+    public K forcePut(@NullableDecl V value, @NullableDecl K key) {
       return forward.putInverse(value, key, true);
     }
 
@@ -926,9 +945,9 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     }
 
     @Override
-    @Nullable
     @CanIgnoreReturnValue
-    public K remove(@Nullable Object value) {
+    @NullableDecl
+    public K remove(@NullableDecl Object value) {
       return forward.removeInverse(value);
     }
 
@@ -952,7 +971,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     @Override
     public Set<Entry<V, K>> entrySet() {
       Set<Entry<V, K>> result = inverseEntrySet;
-      return (result == null) ? inverseEntrySet = forward.new InverseEntrySet() : result;
+      return (result == null) ? inverseEntrySet = new InverseEntrySet<K, V>(forward) : result;
     }
 
     @GwtIncompatible("serialization")
@@ -962,15 +981,19 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     }
   }
 
-  class InverseEntrySet extends View<Entry<V, K>> {
+  static class InverseEntrySet<K, V> extends View<K, V, Entry<V, K>> {
+    InverseEntrySet(HashBiMap<K, V> biMap) {
+      super(biMap);
+    }
+
     @Override
-    public boolean contains(@Nullable Object o) {
+    public boolean contains(@NullableDecl Object o) {
       if (o instanceof Entry) {
         Entry<?, ?> e = (Entry<?, ?>) o;
         Object v = e.getKey();
         Object k = e.getValue();
-        int eIndex = findEntryByValue(v);
-        return eIndex != ABSENT && Objects.equal(keys[eIndex], k);
+        int eIndex = biMap.findEntryByValue(v);
+        return eIndex != ABSENT && Objects.equal(biMap.keys[eIndex], k);
       }
       return false;
     }
@@ -982,9 +1005,9 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
         Object v = e.getKey();
         Object k = e.getValue();
         int vHash = Hashing.smearedHash(v);
-        int eIndex = findEntryByValue(v, vHash);
-        if (eIndex != ABSENT && Objects.equal(keys[eIndex], k)) {
-          removeEntryValueHashKnown(eIndex, vHash);
+        int eIndex = biMap.findEntryByValue(v, vHash);
+        if (eIndex != ABSENT && Objects.equal(biMap.keys[eIndex], k)) {
+          biMap.removeEntryValueHashKnown(eIndex, vHash);
           return true;
         }
       }
@@ -993,7 +1016,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
 
     @Override
     Entry<V, K> forEntry(int entry) {
-      return new EntryForValue(entry);
+      return new EntryForValue<K, V>(biMap, entry);
     }
   }
 
@@ -1002,18 +1025,20 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
    * the value is moved, deleted, or reinserted, it will account for that -- while not doing any
    * extra work if the value has not moved.
    */
-  final class EntryForValue extends AbstractMapEntry<V, K> {
+  static final class EntryForValue<K, V> extends AbstractMapEntry<V, K> {
+    final HashBiMap<K, V> biMap;
     final V value;
     int index;
 
-    EntryForValue(int index) {
-      this.value = values[index];
+    EntryForValue(HashBiMap<K, V> biMap, int index) {
+      this.biMap = biMap;
+      this.value = biMap.values[index];
       this.index = index;
     }
 
     private void updateIndex() {
-      if (index == ABSENT || index > size || !Objects.equal(value, values[index])) {
-        index = findEntryByValue(value);
+      if (index == ABSENT || index > biMap.size || !Objects.equal(value, biMap.values[index])) {
+        index = biMap.findEntryByValue(value);
       }
     }
 
@@ -1025,20 +1050,20 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
     @Override
     public K getValue() {
       updateIndex();
-      return (index == ABSENT) ? null : keys[index];
+      return (index == ABSENT) ? null : biMap.keys[index];
     }
 
     @Override
     public K setValue(K key) {
       updateIndex();
       if (index == ABSENT) {
-        return HashBiMap.this.putInverse(value, key, false);
+        return biMap.putInverse(value, key, false);
       }
-      K oldKey = keys[index];
+      K oldKey = biMap.keys[index];
       if (Objects.equal(oldKey, key)) {
         return key;
       }
-      replaceKeyInEntry(index, key, false);
+      biMap.replaceKeyInEntry(index, key, false);
       return oldKey;
     }
   }

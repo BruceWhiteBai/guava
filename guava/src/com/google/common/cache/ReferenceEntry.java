@@ -16,7 +16,7 @@ package com.google.common.cache;
 
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.cache.LocalCache.ValueReference;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An entry in a reference map.

@@ -16,11 +16,11 @@ package com.google.common.base;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * Determines a true or false value for a given input; a pre-Java-8 version of {@code
- * java.util.function.Predicate}.
+ * Determines a true or false value for a given input; a pre-Java-8 version of {@link
+ * java.util.function.Predicate java.util.function.Predicate}.
  *
  * <p>The {@link Predicates} class provides common predicates and related utilities.
  *
@@ -62,7 +62,7 @@ public interface Predicate<T> {
    *     arguments
    */
   @CanIgnoreReturnValue
-  boolean apply(@Nullable T input);
+  boolean apply(@NullableDecl T input);
 
   /**
    * Indicates whether another object is equal to this predicate.
@@ -75,5 +75,5 @@ public interface Predicate<T> {
    * predicates are known <i>not</i> to be interchangeable.
    */
   @Override
-  boolean equals(@Nullable Object object);
+  boolean equals(@NullableDecl Object object);
 }

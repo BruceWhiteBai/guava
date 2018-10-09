@@ -30,7 +30,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An expanded {@code Iterable} API, providing functionality similar to Java 8's powerful <a href=
@@ -256,27 +256,6 @@ public abstract class FluentIterable<E> implements Iterable<E> {
     return concatNoDefensiveCopy(Arrays.copyOf(inputs, inputs.length));
   }
 
-  /** Concatenates a varargs array of iterables without making a defensive copy of the array. */
-  private static <T> FluentIterable<T> concatNoDefensiveCopy(
-      final Iterable<? extends T>... inputs) {
-    for (Iterable<? extends T> input : inputs) {
-      checkNotNull(input);
-    }
-    return new FluentIterable<T>() {
-      @Override
-      public Iterator<T> iterator() {
-        return Iterators.concat(
-            /* lazily generate the iterators on each input only as needed */
-            new AbstractIndexedListIterator<Iterator<? extends T>>(inputs.length) {
-              @Override
-              public Iterator<? extends T> get(int i) {
-                return inputs[i].iterator();
-              }
-            });
-      }
-    };
-  }
-
   /**
    * Returns a fluent iterable that combines several iterables. The returned iterable has an
    * iterator that traverses the elements of each iterable in {@code inputs}. The input iterators
@@ -303,6 +282,27 @@ public abstract class FluentIterable<E> implements Iterable<E> {
     };
   }
 
+  /** Concatenates a varargs array of iterables without making a defensive copy of the array. */
+  private static <T> FluentIterable<T> concatNoDefensiveCopy(
+      final Iterable<? extends T>... inputs) {
+    for (Iterable<? extends T> input : inputs) {
+      checkNotNull(input);
+    }
+    return new FluentIterable<T>() {
+      @Override
+      public Iterator<T> iterator() {
+        return Iterators.concat(
+            /* lazily generate the iterators on each input only as needed */
+            new AbstractIndexedListIterator<Iterator<? extends T>>(inputs.length) {
+              @Override
+              public Iterator<? extends T> get(int i) {
+                return inputs[i].iterator();
+              }
+            });
+      }
+    };
+  }
+
   /**
    * Returns a fluent iterable containing no elements.
    *
@@ -324,7 +324,7 @@ public abstract class FluentIterable<E> implements Iterable<E> {
    * @since 20.0
    */
   @Beta
-  public static <E> FluentIterable<E> of(@Nullable E element, E... elements) {
+  public static <E> FluentIterable<E> of(@NullableDecl E element, E... elements) {
     return from(Lists.asList(element, elements));
   }
 
@@ -355,7 +355,7 @@ public abstract class FluentIterable<E> implements Iterable<E> {
    *
    * <p><b>{@code Stream} equivalent:</b> {@code stream.anyMatch(Predicate.isEqual(target))}.
    */
-  public final boolean contains(@Nullable Object target) {
+  public final boolean contains(@NullableDecl Object target) {
     return Iterables.contains(getDelegate(), target);
   }
 
@@ -835,7 +835,7 @@ public abstract class FluentIterable<E> implements Iterable<E> {
    * @throws IndexOutOfBoundsException if {@code position} is negative or greater than or equal to
    *     the size of this fluent iterable
    */
-  // TODO(kevinb): add @Nullable?
+  // TODO(kevinb): add @NullableDecl?
   public final E get(int position) {
     return Iterables.get(getDelegate(), position);
   }

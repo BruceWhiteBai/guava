@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A multiset that supports concurrent modifications and that provides atomic versions of most
@@ -476,6 +476,13 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
   }
 
   @Override
+  Iterator<E> elementIterator() {
+    throw new AssertionError("should never be called");
+  }
+
+  /** @deprecated Internal method, use {@link #entrySet()}. */
+  @Deprecated
+  @Override
   public Set<Multiset.Entry<E>> createEntrySet() {
     return new EntrySet();
   }
@@ -515,7 +522,7 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
         };
 
     return new ForwardingIterator<Entry<E>>() {
-      private Entry<E> last;
+      private @Nullable Entry<E> last;
 
       @Override
       protected Iterator<Entry<E>> delegate() {
@@ -535,6 +542,11 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
         last = null;
       }
     };
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    return Multisets.iteratorImpl(this);
   }
 
   @Override

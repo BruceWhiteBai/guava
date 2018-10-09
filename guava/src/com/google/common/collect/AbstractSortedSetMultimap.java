@@ -20,10 +20,10 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.SortedSet;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Basic implementation of the {@link SortedSetMultimap} interface. It's a wrapper around {@link
@@ -49,11 +49,24 @@ abstract class AbstractSortedSetMultimap<K, V> extends AbstractSetMultimap<K, V>
 
   @Override
   SortedSet<V> createUnmodifiableEmptyCollection() {
-    Comparator<? super V> comparator = valueComparator();
-    if (comparator == null) {
-      return Collections.unmodifiableSortedSet(createCollection());
+    return unmodifiableCollectionSubclass(createCollection());
+  }
+
+  @Override
+  <E> SortedSet<E> unmodifiableCollectionSubclass(Collection<E> collection) {
+    if (collection instanceof NavigableSet) {
+      return Sets.unmodifiableNavigableSet((NavigableSet<E>) collection);
     } else {
-      return ImmutableSortedSet.emptySet(valueComparator());
+      return Collections.unmodifiableSortedSet((SortedSet<E>) collection);
+    }
+  }
+
+  @Override
+  Collection<V> wrapCollection(K key, Collection<V> collection) {
+    if (collection instanceof NavigableSet) {
+      return new WrappedNavigableSet(key, (NavigableSet<V>) collection, null);
+    } else {
+      return new WrappedSortedSet(key, (SortedSet<V>) collection, null);
     }
   }
 

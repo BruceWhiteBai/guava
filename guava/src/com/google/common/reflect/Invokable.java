@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +31,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Wrapper around either a {@link Method} or a {@link Constructor}. Convenience API is provided to
@@ -116,9 +117,12 @@ public abstract class Invokable<T, R> extends Element implements GenericDeclarat
   public final ImmutableList<Parameter> getParameters() {
     Type[] parameterTypes = getGenericParameterTypes();
     Annotation[][] annotations = getParameterAnnotations();
+    AnnotatedType[] annotatedTypes = getAnnotatedParameterTypes();
     ImmutableList.Builder<Parameter> builder = ImmutableList.builder();
     for (int i = 0; i < parameterTypes.length; i++) {
-      builder.add(new Parameter(this, i, TypeToken.of(parameterTypes[i]), annotations[i]));
+      builder.add(
+          new Parameter(
+              this, i, TypeToken.of(parameterTypes[i]), annotations[i], annotatedTypes[i]));
     }
     return builder.build();
   }
@@ -178,12 +182,16 @@ public abstract class Invokable<T, R> extends Element implements GenericDeclarat
 
   abstract Type[] getGenericParameterTypes();
 
+  abstract AnnotatedType[] getAnnotatedParameterTypes();
+
   /** This should never return a type that's not a subtype of Throwable. */
   abstract Type[] getGenericExceptionTypes();
 
   abstract Annotation[][] getParameterAnnotations();
 
   abstract Type getGenericReturnType();
+
+  public abstract AnnotatedType getAnnotatedReturnType();
 
   static class MethodInvokable<T> extends Invokable<T, Object> {
 
@@ -208,6 +216,16 @@ public abstract class Invokable<T, R> extends Element implements GenericDeclarat
     @Override
     Type[] getGenericParameterTypes() {
       return method.getGenericParameterTypes();
+    }
+
+    @Override
+    AnnotatedType[] getAnnotatedParameterTypes() {
+      return method.getAnnotatedParameterTypes();
+    }
+
+    @Override
+    public AnnotatedType getAnnotatedReturnType() {
+      return method.getAnnotatedReturnType();
     }
 
     @Override
@@ -285,6 +303,16 @@ public abstract class Invokable<T, R> extends Element implements GenericDeclarat
         }
       }
       return types;
+    }
+
+    @Override
+    AnnotatedType[] getAnnotatedParameterTypes() {
+      return constructor.getAnnotatedParameterTypes();
+    }
+
+    @Override
+    public AnnotatedType getAnnotatedReturnType() {
+      return constructor.getAnnotatedReturnType();
     }
 
     @Override

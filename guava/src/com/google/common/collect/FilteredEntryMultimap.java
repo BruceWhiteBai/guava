@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of {@link Multimaps#filterEntries(Multimap, Predicate)}.
@@ -140,7 +140,7 @@ class FilteredEntryMultimap<K, V> extends AbstractMultimap<K, V> implements Filt
   }
 
   @Override
-  public Set<K> keySet() {
+  Set<K> createKeySet() {
     return asMap().keySet();
   }
 

@@ -16,7 +16,7 @@ package com.google.common.base;
 
 import com.google.common.annotations.GwtCompatible;
 import java.util.Arrays;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Helper functions that can operate on any {@code Object}.
@@ -73,7 +73,7 @@ public final class Objects extends ExtraObjectsMethodsForWeb {
    * <p><b>Note for Java 7 and later:</b> This method should be treated as deprecated; use {@link
    * java.util.Objects#hash} instead.
    */
-  public static int hashCode(@Nullable Object... objects) {
+  public static int hashCode(Object @Nullable... objects) {
     return Arrays.hashCode(objects);
   }
 }

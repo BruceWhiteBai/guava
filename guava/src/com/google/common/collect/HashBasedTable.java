@@ -24,7 +24,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of {@link Table} using linked hash tables. This guarantees predictable iteration

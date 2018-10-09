@@ -25,7 +25,7 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation for {@link FilteredMultimap#values()}.

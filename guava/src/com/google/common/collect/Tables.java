@@ -36,7 +36,7 @@ import java.util.SortedSet;
 import java.util.Spliterator;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Provides static methods that involve a {@code Table}.
@@ -151,9 +151,9 @@ public final class Tables {
   }
 
   static final class ImmutableCell<R, C, V> extends AbstractCell<R, C, V> implements Serializable {
-    private final R rowKey;
-    private final C columnKey;
-    private final V value;
+    private final @Nullable R rowKey;
+    private final @Nullable C columnKey;
+    private final @Nullable V value;
 
     ImmutableCell(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
       this.rowKey = rowKey;

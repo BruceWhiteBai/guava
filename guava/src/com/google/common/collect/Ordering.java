@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A comparator, with additional methods to support common operations. This is an "enriched" version

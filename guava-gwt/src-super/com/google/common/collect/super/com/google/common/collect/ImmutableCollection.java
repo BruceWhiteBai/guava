@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Spliterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * GWT emulated version of {@link ImmutableCollection}.
@@ -87,6 +87,28 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
       default:
         return new RegularImmutableAsList<E>(this, toArray());
     }
+  }
+
+  /** If this collection is backed by an array of its elements in insertion order, returns it. */
+  @Nullable
+  Object[] internalArray() {
+    return null;
+  }
+
+  /**
+   * If this collection is backed by an array of its elements in insertion order, returns the offset
+   * where this collection's elements start.
+   */
+  int internalArrayStart() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * If this collection is backed by an array of its elements in insertion order, returns the offset
+   * where this collection's elements end.
+   */
+  int internalArrayEnd() {
+    throw new UnsupportedOperationException();
   }
 
   static <E> ImmutableCollection<E> unsafeDelegate(Collection<E> delegate) {

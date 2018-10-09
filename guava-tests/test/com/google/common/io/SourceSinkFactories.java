@@ -40,7 +40,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * {@link SourceSinkFactory} implementations.
@@ -340,7 +340,7 @@ public class SourceSinkFactories {
 
     private final byte[] initialBytes;
 
-    private FileByteSinkFactory(@Nullable byte[] initialBytes) {
+    private FileByteSinkFactory(byte @Nullable [] initialBytes) {
       this.initialBytes = initialBytes;
     }
 
@@ -520,7 +520,7 @@ public class SourceSinkFactories {
 
     private final byte[] initialBytes;
 
-    private PathByteSinkFactory(@Nullable byte[] initialBytes) {
+    private PathByteSinkFactory(byte @Nullable [] initialBytes) {
       this.initialBytes = initialBytes;
     }
 

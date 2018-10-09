@@ -45,7 +45,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class contains static utility methods that operate on or return objects of type {@link
@@ -168,7 +168,7 @@ public final class Iterators {
   }
 
   /** Returns {@code true} if {@code iterator} contains {@code element}. */
-  public static boolean contains(Iterator<?> iterator, @Nullable Object element) {
+  public static boolean contains(Iterator<?> iterator, @NullableDecl Object element) {
     if (element == null) {
       while (iterator.hasNext()) {
         if (iterator.next() == null) {
@@ -324,8 +324,8 @@ public final class Iterators {
    *     iterator is unspecified.
    */
   @CanIgnoreReturnValue // TODO(kak): Consider removing this?
-  @Nullable
-  public static <T> T getOnlyElement(Iterator<? extends T> iterator, @Nullable T defaultValue) {
+  @NullableDecl
+  public static <T> T getOnlyElement(Iterator<? extends T> iterator, @NullableDecl T defaultValue) {
     return iterator.hasNext() ? getOnlyElement(iterator) : defaultValue;
   }
 
@@ -366,7 +366,7 @@ public final class Iterators {
    *
    * @see Collections#frequency
    */
-  public static int frequency(Iterator<?> iterator, @Nullable Object element) {
+  public static int frequency(Iterator<?> iterator, @NullableDecl Object element) {
     int count = 0;
     while (contains(iterator, element)) {
       // Since it lives in the same class, we know contains gets to the element and then stops,
@@ -535,14 +535,6 @@ public final class Iterators {
     return concatNoDefensiveCopy(Arrays.copyOf(inputs, inputs.length));
   }
 
-  /** Concats a varargs array of iterators without making a defensive copy of the array. */
-  static <T> Iterator<T> concatNoDefensiveCopy(Iterator<? extends T>... inputs) {
-    for (Iterator<? extends T> input : checkNotNull(inputs)) {
-      checkNotNull(input);
-    }
-    return concat(consumingForArray(inputs));
-  }
-
   /**
    * Combines multiple iterators into a single iterator. The returned iterator iterates across the
    * elements of each iterator in {@code inputs}. The input iterators are not polled until
@@ -554,6 +546,14 @@ public final class Iterators {
    */
   public static <T> Iterator<T> concat(Iterator<? extends Iterator<? extends T>> inputs) {
     return new ConcatenatedIterator<T>(inputs);
+  }
+
+  /** Concats a varargs array of iterators without making a defensive copy of the array. */
+  static <T> Iterator<T> concatNoDefensiveCopy(Iterator<? extends T>... inputs) {
+    for (Iterator<? extends T> input : checkNotNull(inputs)) {
+      checkNotNull(input);
+    }
+    return concat(consumingForArray(inputs));
   }
 
   /**
@@ -707,9 +707,11 @@ public final class Iterators {
    *
    * @since 7.0
    */
-  @Nullable
+  @NullableDecl
   public static <T> T find(
-      Iterator<? extends T> iterator, Predicate<? super T> predicate, @Nullable T defaultValue) {
+      Iterator<? extends T> iterator,
+      Predicate<? super T> predicate,
+      @NullableDecl T defaultValue) {
     checkNotNull(iterator);
     checkNotNull(predicate);
     while (iterator.hasNext()) {
@@ -811,12 +813,6 @@ public final class Iterators {
     return iterator.next();
   }
 
-  static void checkNonnegative(int position) {
-    if (position < 0) {
-      throw new IndexOutOfBoundsException("position (" + position + ") must not be negative");
-    }
-  }
-
   /**
    * Advances {@code iterator} {@code position + 1} times, returning the element at the {@code
    * position}th position or {@code defaultValue} otherwise.
@@ -829,11 +825,18 @@ public final class Iterators {
    * @throws IndexOutOfBoundsException if {@code position} is negative
    * @since 4.0
    */
-  @Nullable
-  public static <T> T get(Iterator<? extends T> iterator, int position, @Nullable T defaultValue) {
+  @NullableDecl
+  public static <T> T get(
+      Iterator<? extends T> iterator, int position, @NullableDecl T defaultValue) {
     checkNonnegative(position);
     advance(iterator, position);
     return getNext(iterator, defaultValue);
+  }
+
+  static void checkNonnegative(int position) {
+    if (position < 0) {
+      throw new IndexOutOfBoundsException("position (" + position + ") must not be negative");
+    }
   }
 
   /**
@@ -844,8 +847,8 @@ public final class Iterators {
    * @return the next element of {@code iterator} or the default value
    * @since 7.0
    */
-  @Nullable
-  public static <T> T getNext(Iterator<? extends T> iterator, @Nullable T defaultValue) {
+  @NullableDecl
+  public static <T> T getNext(Iterator<? extends T> iterator, @NullableDecl T defaultValue) {
     return iterator.hasNext() ? iterator.next() : defaultValue;
   }
 
@@ -872,8 +875,8 @@ public final class Iterators {
    * @return the last element of {@code iterator}
    * @since 3.0
    */
-  @Nullable
-  public static <T> T getLast(Iterator<? extends T> iterator, @Nullable T defaultValue) {
+  @NullableDecl
+  public static <T> T getLast(Iterator<? extends T> iterator, @NullableDecl T defaultValue) {
     return iterator.hasNext() ? getLast(iterator) : defaultValue;
   }
 
@@ -970,7 +973,7 @@ public final class Iterators {
    * Deletes and returns the next value from the iterator, or returns {@code null} if there is no
    * such value.
    */
-  @Nullable
+  @NullableDecl
   static <T> T pollNext(Iterator<T> iterator) {
     if (iterator.hasNext()) {
       T result = iterator.next();
@@ -1007,24 +1010,6 @@ public final class Iterators {
     return forArray(array, 0, array.length, 0);
   }
 
-  private static final class ArrayItr<T> extends AbstractIndexedListIterator<T> {
-    static final UnmodifiableListIterator<Object> EMPTY = new ArrayItr<>(new Object[0], 0, 0, 0);
-
-    private final T[] array;
-    private final int offset;
-
-    ArrayItr(T[] array, int offset, int length, int index) {
-      super(length, index);
-      this.array = array;
-      this.offset = offset;
-    }
-
-    @Override
-    protected T get(int index) {
-      return array[offset + index];
-    }
-  }
-
   /**
    * Returns a list iterator containing the elements in the specified range of {@code array} in
    * order, starting at the specified index.
@@ -1046,12 +1031,30 @@ public final class Iterators {
     return new ArrayItr<T>(array, offset, length, index);
   }
 
+  private static final class ArrayItr<T> extends AbstractIndexedListIterator<T> {
+    static final UnmodifiableListIterator<Object> EMPTY = new ArrayItr<>(new Object[0], 0, 0, 0);
+
+    private final T[] array;
+    private final int offset;
+
+    ArrayItr(T[] array, int offset, int length, int index) {
+      super(length, index);
+      this.array = array;
+      this.offset = offset;
+    }
+
+    @Override
+    protected T get(int index) {
+      return array[offset + index];
+    }
+  }
+
   /**
    * Returns an iterator containing only {@code value}.
    *
    * <p>The {@link Iterable} equivalent of this method is {@link Collections#singleton}.
    */
-  public static <T> UnmodifiableIterator<T> singletonIterator(@Nullable final T value) {
+  public static <T> UnmodifiableIterator<T> singletonIterator(@NullableDecl final T value) {
     return new UnmodifiableIterator<T>() {
       boolean done;
 
@@ -1119,7 +1122,7 @@ public final class Iterators {
 
     private final Iterator<? extends E> iterator;
     private boolean hasPeeked;
-    private E peekedElement;
+    @NullableDecl private E peekedElement;
 
     public PeekingImpl(Iterator<? extends E> iterator) {
       this.iterator = checkNotNull(iterator);
@@ -1288,7 +1291,7 @@ public final class Iterators {
 
   private static class ConcatenatedIterator<T> implements Iterator<T> {
     /* The last iterator to return an element.  Calls to remove() go to this iterator. */
-    private Iterator<? extends T> toRemove;
+    @NullableDecl private Iterator<? extends T> toRemove;
 
     /* The iterator currently returning elements. */
     private Iterator<? extends T> iterator;
@@ -1303,7 +1306,7 @@ public final class Iterators {
     private Iterator<? extends Iterator<? extends T>> topMetaIterator;
 
     // Only becomes nonnull if we encounter nested concatenations.
-    @Nullable private Deque<Iterator<? extends Iterator<? extends T>>> metaIterators;
+    @NullableDecl private Deque<Iterator<? extends Iterator<? extends T>>> metaIterators;
 
     ConcatenatedIterator(Iterator<? extends Iterator<? extends T>> metaIterator) {
       iterator = emptyIterator();
@@ -1311,7 +1314,7 @@ public final class Iterators {
     }
 
     // Returns a nonempty meta-iterator or, if all meta-iterators are empty, null.
-    @Nullable
+    @NullableDecl
     private Iterator<? extends Iterator<? extends T>> getTopMetaIterator() {
       while (topMetaIterator == null || !topMetaIterator.hasNext()) {
         if (metaIterators != null && !metaIterators.isEmpty()) {

@@ -25,7 +25,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Aggregate future that computes its value by calling a callable. */
 @GwtCompatible
@@ -150,7 +150,8 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
       return checkNotNull(
           result,
           "AsyncCallable.call returned null instead of a Future. "
-              + "Did you mean to return immediateFuture(null)?");
+              + "Did you mean to return immediateFuture(null)? %s",
+          callable);
     }
 
     @Override
@@ -159,7 +160,7 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }
@@ -185,7 +186,7 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }

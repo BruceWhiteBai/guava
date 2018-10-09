@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Benchmarks for {@link ExecutionList}. */
 @VmOptions({"-Xms8g", "-Xmx8g"})
@@ -186,6 +186,7 @@ public class ExecutionListBenchmark {
             future.set(null);
           }
 
+          @SuppressWarnings("FutureReturnValueIgnored")
           @Override
           public Object getImpl() {
             return future;
@@ -209,6 +210,7 @@ public class ExecutionListBenchmark {
             future.set(null);
           }
 
+          @SuppressWarnings("FutureReturnValueIgnored")
           @Override
           public Object getImpl() {
             return future;

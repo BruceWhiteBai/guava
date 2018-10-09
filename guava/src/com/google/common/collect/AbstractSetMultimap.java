@@ -19,10 +19,11 @@ package com.google.common.collect;
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Basic implementation of the {@link SetMultimap} interface. It's a wrapper around {@link
@@ -48,7 +49,17 @@ abstract class AbstractSetMultimap<K, V> extends AbstractMapBasedMultimap<K, V>
 
   @Override
   Set<V> createUnmodifiableEmptyCollection() {
-    return ImmutableSet.of();
+    return Collections.emptySet();
+  }
+
+  @Override
+  <E> Collection<E> unmodifiableCollectionSubclass(Collection<E> collection) {
+    return Collections.unmodifiableSet((Set<E>) collection);
+  }
+
+  @Override
+  Collection<V> wrapCollection(K key, Collection<V> collection) {
+    return new WrappedSet(key, (Set<V>) collection);
   }
 
   // Following Javadoc copied from SetMultimap.

@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Utility methods for working with {@link Closeable} objects.

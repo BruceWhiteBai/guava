@@ -23,7 +23,7 @@ import com.google.errorprone.annotations.CompatibleWith;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A collection that associates an ordered pair of keys, called a row key and a column key, with a

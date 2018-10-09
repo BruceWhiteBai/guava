@@ -20,7 +20,7 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.ForOverride;
 import java.io.Serializable;
 import java.util.function.BiPredicate;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A strategy for determining whether two instances are considered equivalent, and for computing
@@ -184,7 +184,7 @@ public abstract class Equivalence<T> implements BiPredicate<T, T> {
    */
   public static final class Wrapper<T> implements Serializable {
     private final Equivalence<? super T> equivalence;
-    @Nullable private final T reference;
+    private final @Nullable T reference;
 
     private Wrapper(Equivalence<? super T> equivalence, @Nullable T reference) {
       this.equivalence = checkNotNull(equivalence);
@@ -192,8 +192,7 @@ public abstract class Equivalence<T> implements BiPredicate<T, T> {
     }
 
     /** Returns the (possibly null) reference wrapped by this instance. */
-    @Nullable
-    public T get() {
+    public @Nullable T get() {
       return reference;
     }
 
@@ -272,7 +271,7 @@ public abstract class Equivalence<T> implements BiPredicate<T, T> {
   private static final class EquivalentToPredicate<T> implements Predicate<T>, Serializable {
 
     private final Equivalence<T> equivalence;
-    @Nullable private final T target;
+    private final @Nullable T target;
 
     EquivalentToPredicate(Equivalence<T> equivalence, @Nullable T target) {
       this.equivalence = checkNotNull(equivalence);

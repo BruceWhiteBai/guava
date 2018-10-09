@@ -33,7 +33,6 @@ import java.io.Serializable;
 import java.util.AbstractSequentialList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -42,7 +41,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An implementation of {@code ListMultimap} that supports deterministic iteration order for both
@@ -61,7 +60,7 @@ import javax.annotation.Nullable;
  * between keys, entries and values. For example, calling:
  *
  * <pre>{@code
- * map.remove(key1, foo);
+ * multimap.remove(key1, foo);
  * }</pre>
  *
  * <p>changes the entries iteration order to {@code [key2=bar, key1=baz]} and the key iteration
@@ -107,12 +106,12 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
    */
 
   private static final class Node<K, V> extends AbstractMapEntry<K, V> {
-    final K key;
-    V value;
-    Node<K, V> next; // the next node (with any key)
-    Node<K, V> previous; // the previous node (with any key)
-    Node<K, V> nextSibling; // the next node with the same key
-    Node<K, V> previousSibling; // the previous node with the same key
+    final @Nullable K key;
+    @Nullable V value;
+    @Nullable Node<K, V> next; // the next node (with any key)
+    @Nullable Node<K, V> previous; // the previous node (with any key)
+    @Nullable Node<K, V> nextSibling; // the next node with the same key
+    @Nullable Node<K, V> previousSibling; // the previous node with the same key
 
     Node(@Nullable K key, @Nullable V value) {
       this.key = key;
@@ -151,8 +150,8 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
     }
   }
 
-  private transient Node<K, V> head; // the head for all keys
-  private transient Node<K, V> tail; // the tail for all keys
+  private transient @Nullable Node<K, V> head; // the head for all keys
+  private transient @Nullable Node<K, V> tail; // the tail for all keys
   private transient Map<K, KeyList<K, V>> keyToKeyList;
   private transient int size;
 
@@ -192,11 +191,11 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
   }
 
   LinkedListMultimap() {
-    keyToKeyList = Maps.newHashMap();
+    this(12);
   }
 
   private LinkedListMultimap(int expectedKeys) {
-    keyToKeyList = new HashMap<>(expectedKeys);
+    keyToKeyList = Platform.newHashMapWithExpectedSize(expectedKeys);
   }
 
   private LinkedListMultimap(Multimap<? extends K, ? extends V> multimap) {
@@ -308,9 +307,9 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
   /** An {@code Iterator} over all nodes. */
   private class NodeIterator implements ListIterator<Entry<K, V>> {
     int nextIndex;
-    Node<K, V> next;
-    Node<K, V> current;
-    Node<K, V> previous;
+    @Nullable Node<K, V> next;
+    @Nullable Node<K, V> current;
+    @Nullable Node<K, V> previous;
     int expectedModCount = modCount;
 
     NodeIterator(int index) {
@@ -416,7 +415,7 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
   private class DistinctKeyIterator implements Iterator<K> {
     final Set<K> seenKeys = Sets.<K>newHashSetWithExpectedSize(keySet().size());
     Node<K, V> next = head;
-    Node<K, V> current;
+    @Nullable Node<K, V> current;
     int expectedModCount = modCount;
 
     private void checkForConcurrentModification() {
@@ -455,11 +454,11 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
 
   /** A {@code ListIterator} over values for a specified key. */
   private class ValueForKeyIterator implements ListIterator<V> {
-    final Object key;
+    final @Nullable Object key;
     int nextIndex;
-    Node<K, V> next;
-    Node<K, V> current;
-    Node<K, V> previous;
+    @Nullable Node<K, V> next;
+    @Nullable Node<K, V> current;
+    @Nullable Node<K, V> previous;
 
     /** Constructs a new iterator over all values for the specified key. */
     ValueForKeyIterator(@Nullable Object key) {
@@ -717,6 +716,11 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
       }
     }
     return new KeySetImpl();
+  }
+
+  @Override
+  Multiset<K> createKeys() {
+    return new Multimaps.Keys<K, V>(this);
   }
 
   /**

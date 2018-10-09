@@ -19,7 +19,7 @@ package com.google.common.graph;
 import com.google.common.annotations.Beta;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An interface for <a

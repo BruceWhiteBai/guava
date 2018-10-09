@@ -25,6 +25,7 @@ import com.google.common.base.Converter;
 import com.google.common.base.Objects;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.MutableClassToInstanceMap;
@@ -32,6 +33,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
 import com.google.common.reflect.Reflection;
 import com.google.common.reflect.TypeToken;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -42,15 +44,15 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A test utility that verifies that your methods and constructors throw {@link
  * NullPointerException} or {@link UnsupportedOperationException} whenever null is passed to a
- * parameter that isn't annotated with {@link Nullable}.
+ * parameter whose declaration or type isn't annotated with an annotation with the simple name
+ * {@code Nullable}, {@lcode CheckForNull}, {@link NullableType}, or {@link NullableDecl}.
  *
  * <p>The tested methods and constructors are invoked -- each time with one parameter being null and
  * the rest not null -- and the test fails if no expected exception is thrown. {@code
@@ -169,8 +171,7 @@ public final class NullPointerTester {
 
   /**
    * Verifies that {@code method} produces a {@link NullPointerException} or {@link
-   * UnsupportedOperationException} whenever <i>any</i> of its non-{@link Nullable} parameters are
-   * null.
+   * UnsupportedOperationException} whenever <i>any</i> of its non-nullable parameters are null.
    *
    * @param instance the instance to invoke {@code method} on, or null if {@code method} is static
    */
@@ -183,8 +184,7 @@ public final class NullPointerTester {
 
   /**
    * Verifies that {@code ctor} produces a {@link NullPointerException} or {@link
-   * UnsupportedOperationException} whenever <i>any</i> of its non-{@link Nullable} parameters are
-   * null.
+   * UnsupportedOperationException} whenever <i>any</i> of its non-nullable parameters are null.
    */
   public void testConstructor(Constructor<?> ctor) {
     Class<?> declaringClass = ctor.getDeclaringClass();
@@ -202,7 +202,7 @@ public final class NullPointerTester {
   /**
    * Verifies that {@code method} produces a {@link NullPointerException} or {@link
    * UnsupportedOperationException} when the parameter in position {@code paramIndex} is null. If
-   * this parameter is marked {@link Nullable}, this method does nothing.
+   * this parameter is marked nullable, this method does nothing.
    *
    * @param instance the instance to invoke {@code method} on, or null if {@code method} is static
    */
@@ -215,7 +215,7 @@ public final class NullPointerTester {
   /**
    * Verifies that {@code ctor} produces a {@link NullPointerException} or {@link
    * UnsupportedOperationException} when the parameter in position {@code paramIndex} is null. If
-   * this parameter is marked {@link Nullable}, this method does nothing.
+   * this parameter is marked nullable, this method does nothing.
    */
   public void testConstructorParameter(Constructor<?> ctor, int paramIndex) {
     ctor.setAccessible(true);
@@ -322,7 +322,7 @@ public final class NullPointerTester {
   /**
    * Verifies that {@code invokable} produces a {@link NullPointerException} or {@link
    * UnsupportedOperationException} when the parameter in position {@code paramIndex} is null. If
-   * this parameter is marked {@link Nullable}, this method does nothing.
+   * this parameter is marked nullable, this method does nothing.
    *
    * @param instance the instance to invoke {@code invokable} on, or null if {@code invokable} is
    *     static
@@ -472,9 +472,26 @@ public final class NullPointerTester {
     return param.getType().getRawType().isPrimitive() || isNullable(param);
   }
 
-  private static boolean isNullable(Parameter param) {
-    return param.isAnnotationPresent(CheckForNull.class)
-        || param.isAnnotationPresent(Nullable.class);
+  private static final ImmutableSet<String> NULLABLE_ANNOTATION_SIMPLE_NAMES =
+      ImmutableSet.of("CheckForNull", "Nullable", "NullableDecl", "NullableType");
+
+  static boolean isNullable(Invokable<?, ?> invokable) {
+    return isNullable(invokable.getAnnotatedReturnType().getAnnotations())
+        || isNullable(invokable.getAnnotations());
+  }
+
+  static boolean isNullable(Parameter param) {
+    return isNullable(param.getAnnotatedType().getAnnotations())
+        || isNullable(param.getAnnotations());
+  }
+
+  private static boolean isNullable(Annotation[] annotations) {
+    for (Annotation annotation : annotations) {
+      if (NULLABLE_ANNOTATION_SIMPLE_NAMES.contains(annotation.annotationType().getSimpleName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private boolean isIgnored(Member member) {

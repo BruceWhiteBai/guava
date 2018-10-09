@@ -21,7 +21,7 @@ import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import java.util.Comparator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A utility for performing a chained comparison statement. For example:

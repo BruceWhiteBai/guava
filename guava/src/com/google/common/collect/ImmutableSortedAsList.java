@@ -18,7 +18,7 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import java.util.Comparator;
 import java.util.Spliterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * List returned by {@code ImmutableSortedSet.asList()} when the set isn't empty.

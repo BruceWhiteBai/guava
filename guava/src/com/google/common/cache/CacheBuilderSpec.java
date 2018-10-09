@@ -27,7 +27,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A specification of a {@link CacheBuilder} configuration.
@@ -106,19 +107,19 @@ public final class CacheBuilderSpec {
           .put("refreshInterval", new RefreshDurationParser())
           .build();
 
-  @VisibleForTesting Integer initialCapacity;
-  @VisibleForTesting Long maximumSize;
-  @VisibleForTesting Long maximumWeight;
-  @VisibleForTesting Integer concurrencyLevel;
-  @VisibleForTesting Strength keyStrength;
-  @VisibleForTesting Strength valueStrength;
-  @VisibleForTesting Boolean recordStats;
+  @MonotonicNonNull @VisibleForTesting Integer initialCapacity;
+  @MonotonicNonNull @VisibleForTesting Long maximumSize;
+  @MonotonicNonNull @VisibleForTesting Long maximumWeight;
+  @MonotonicNonNull @VisibleForTesting Integer concurrencyLevel;
+  @MonotonicNonNull @VisibleForTesting Strength keyStrength;
+  @MonotonicNonNull @VisibleForTesting Strength valueStrength;
+  @MonotonicNonNull @VisibleForTesting Boolean recordStats;
   @VisibleForTesting long writeExpirationDuration;
-  @VisibleForTesting TimeUnit writeExpirationTimeUnit;
+  @MonotonicNonNull @VisibleForTesting TimeUnit writeExpirationTimeUnit;
   @VisibleForTesting long accessExpirationDuration;
-  @VisibleForTesting TimeUnit accessExpirationTimeUnit;
+  @MonotonicNonNull @VisibleForTesting TimeUnit accessExpirationTimeUnit;
   @VisibleForTesting long refreshDuration;
-  @VisibleForTesting TimeUnit refreshTimeUnit;
+  @MonotonicNonNull @VisibleForTesting TimeUnit refreshTimeUnit;
   /** Specification; used for toParseableString(). */
   private final String specification;
 
@@ -277,8 +278,7 @@ public final class CacheBuilderSpec {
    * Converts an expiration duration/unit pair into a single Long for hashing and equality. Uses
    * nanos to match CacheBuilder implementation.
    */
-  @Nullable
-  private static Long durationInNanos(long duration, @Nullable TimeUnit unit) {
+  private static @Nullable Long durationInNanos(long duration, @Nullable TimeUnit unit) {
     return (unit == null) ? null : unit.toNanos(duration);
   }
 

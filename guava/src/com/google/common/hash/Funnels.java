@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Funnels for common types. All implementations are serializable.

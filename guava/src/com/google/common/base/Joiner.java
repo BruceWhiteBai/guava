@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An object which joins pieces of text (specified as an array, {@link Iterable}, varargs or even a
@@ -339,14 +339,6 @@ public class Joiner {
     }
 
     /**
-     * Returns a string containing the string representation of each entry of {@code map}, using the
-     * previously configured separator and key-value separator.
-     */
-    public String join(Map<?, ?> map) {
-      return join(map.entrySet());
-    }
-
-    /**
      * Appends the string representation of each entry in {@code entries}, using the previously
      * configured separator and key-value separator, to {@code appendable}.
      *
@@ -415,6 +407,14 @@ public class Joiner {
         throw new AssertionError(impossible);
       }
       return builder;
+    }
+
+    /**
+     * Returns a string containing the string representation of each entry of {@code map}, using the
+     * previously configured separator and key-value separator.
+     */
+    public String join(Map<?, ?> map) {
+      return join(map.entrySet());
     }
 
     /**

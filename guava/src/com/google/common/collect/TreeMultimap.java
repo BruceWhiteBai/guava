@@ -25,12 +25,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of {@code Multimap} whose keys and values are ordered by their natural ordering or
@@ -117,6 +118,11 @@ public class TreeMultimap<K, V> extends AbstractSortedKeySortedSetMultimap<K, V>
       Multimap<? extends K, ? extends V> multimap) {
     this(keyComparator, valueComparator);
     putAll(multimap);
+  }
+
+  @Override
+  Map<K, Collection<V>> createAsMap() {
+    return createMaybeNavigableAsMap();
   }
 
   /**

@@ -32,13 +32,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Implementation of {@code Multimap} that does not allow duplicate key-value entries and that
@@ -151,25 +149,25 @@ public final class LinkedHashMultimap<K, V>
   static final class ValueEntry<K, V> extends ImmutableEntry<K, V> implements ValueSetLink<K, V> {
     final int smearedValueHash;
 
-    @Nullable ValueEntry<K, V> nextInValueBucket;
+    @NullableDecl ValueEntry<K, V> nextInValueBucket;
 
-    ValueSetLink<K, V> predecessorInValueSet;
-    ValueSetLink<K, V> successorInValueSet;
+    @NullableDecl ValueSetLink<K, V> predecessorInValueSet;
+    @NullableDecl ValueSetLink<K, V> successorInValueSet;
 
-    ValueEntry<K, V> predecessorInMultimap;
-    ValueEntry<K, V> successorInMultimap;
+    @NullableDecl ValueEntry<K, V> predecessorInMultimap;
+    @NullableDecl ValueEntry<K, V> successorInMultimap;
 
     ValueEntry(
-        @Nullable K key,
-        @Nullable V value,
+        @NullableDecl K key,
+        @NullableDecl V value,
         int smearedValueHash,
-        @Nullable ValueEntry<K, V> nextInValueBucket) {
+        @NullableDecl ValueEntry<K, V> nextInValueBucket) {
       super(key, value);
       this.smearedValueHash = smearedValueHash;
       this.nextInValueBucket = nextInValueBucket;
     }
 
-    boolean matchesValue(@Nullable Object v, int smearedVHash) {
+    boolean matchesValue(@NullableDecl Object v, int smearedVHash) {
       return smearedValueHash == smearedVHash && Objects.equal(getValue(), v);
     }
 
@@ -218,7 +216,7 @@ public final class LinkedHashMultimap<K, V>
   private transient ValueEntry<K, V> multimapHeaderEntry;
 
   private LinkedHashMultimap(int keyCapacity, int valueSetCapacity) {
-    super(new LinkedHashMap<K, Collection<V>>(keyCapacity));
+    super(Platform.<K, Collection<V>>newLinkedHashMapWithExpectedSize(keyCapacity));
     checkNonnegative(valueSetCapacity, "expectedValuesPerKey");
 
     this.valueSetCapacity = valueSetCapacity;
@@ -235,7 +233,7 @@ public final class LinkedHashMultimap<K, V>
    */
   @Override
   Set<V> createCollection() {
-    return new LinkedHashSet<V>(valueSetCapacity);
+    return Platform.newLinkedHashSetWithExpectedSize(valueSetCapacity);
   }
 
   /**
@@ -261,7 +259,7 @@ public final class LinkedHashMultimap<K, V>
    */
   @CanIgnoreReturnValue
   @Override
-  public Set<V> replaceValues(@Nullable K key, Iterable<? extends V> values) {
+  public Set<V> replaceValues(@NullableDecl K key, Iterable<? extends V> values) {
     return super.replaceValues(key, values);
   }
 
@@ -366,7 +364,7 @@ public final class LinkedHashMultimap<K, V>
     public Iterator<V> iterator() {
       return new Iterator<V>() {
         ValueSetLink<K, V> nextEntry = firstEntry;
-        ValueEntry<K, V> toRemove;
+        @NullableDecl ValueEntry<K, V> toRemove;
         int expectedModCount = modCount;
 
         private void checkForComodification() {
@@ -410,7 +408,7 @@ public final class LinkedHashMultimap<K, V>
     }
 
     @Override
-    public boolean contains(@Nullable Object o) {
+    public boolean contains(@NullableDecl Object o) {
       int smearedHash = Hashing.smearedHash(o);
       for (ValueEntry<K, V> entry = hashTable[smearedHash & mask()];
           entry != null;
@@ -423,7 +421,7 @@ public final class LinkedHashMultimap<K, V>
     }
 
     @Override
-    public boolean add(@Nullable V value) {
+    public boolean add(@NullableDecl V value) {
       int smearedHash = Hashing.smearedHash(value);
       int bucket = smearedHash & mask();
       ValueEntry<K, V> rowHead = hashTable[bucket];
@@ -464,7 +462,7 @@ public final class LinkedHashMultimap<K, V>
 
     @CanIgnoreReturnValue
     @Override
-    public boolean remove(@Nullable Object o) {
+    public boolean remove(@NullableDecl Object o) {
       int smearedHash = Hashing.smearedHash(o);
       int bucket = smearedHash & mask();
       ValueEntry<K, V> prev = null;
@@ -507,7 +505,7 @@ public final class LinkedHashMultimap<K, V>
   Iterator<Entry<K, V>> entryIterator() {
     return new Iterator<Entry<K, V>>() {
       ValueEntry<K, V> nextEntry = multimapHeaderEntry.successorInMultimap;
-      ValueEntry<K, V> toRemove;
+      @NullableDecl ValueEntry<K, V> toRemove;
 
       @Override
       public boolean hasNext() {
@@ -570,7 +568,7 @@ public final class LinkedHashMultimap<K, V>
     succeedsInMultimap(multimapHeaderEntry, multimapHeaderEntry);
     valueSetCapacity = DEFAULT_VALUE_SET_CAPACITY;
     int distinctKeys = stream.readInt();
-    Map<K, Collection<V>> map = new LinkedHashMap<>();
+    Map<K, Collection<V>> map = Platform.newLinkedHashMapWithExpectedSize(12);
     for (int i = 0; i < distinctKeys; i++) {
       @SuppressWarnings("unchecked")
       K key = (K) stream.readObject();

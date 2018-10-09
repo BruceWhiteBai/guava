@@ -25,9 +25,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 import junit.framework.Test;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Tests for {@code Synchronized#set}.

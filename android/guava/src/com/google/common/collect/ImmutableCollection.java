@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A {@link Collection} whose contents will never change, and which offers a few additional
@@ -171,13 +171,7 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
 
   @Override
   public final Object[] toArray() {
-    int size = size();
-    if (size == 0) {
-      return EMPTY_ARRAY;
-    }
-    Object[] result = new Object[size];
-    copyIntoArray(result, 0);
-    return result;
+    return toArray(EMPTY_ARRAY);
   }
 
   @CanIgnoreReturnValue
@@ -185,7 +179,12 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
   public final <T> T[] toArray(T[] other) {
     checkNotNull(other);
     int size = size();
+
     if (other.length < size) {
+      Object[] internal = internalArray();
+      if (internal != null) {
+        return Platform.copy(internal, internalArrayStart(), internalArrayEnd(), other);
+      }
       other = ObjectArrays.newArray(other, size);
     } else if (other.length > size) {
       other[size] = null;
@@ -194,8 +193,29 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
     return other;
   }
 
+  /** If this collection is backed by an array of its elements in insertion order, returns it. */
+  Object[] internalArray() {
+    return null;
+  }
+
+  /**
+   * If this collection is backed by an array of its elements in insertion order, returns the offset
+   * where this collection's elements start.
+   */
+  int internalArrayStart() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * If this collection is backed by an array of its elements in insertion order, returns the offset
+   * where this collection's elements end.
+   */
+  int internalArrayEnd() {
+    throw new UnsupportedOperationException();
+  }
+
   @Override
-  public abstract boolean contains(@Nullable Object object);
+  public abstract boolean contains(@NullableDecl Object object);
 
   /**
    * Guaranteed to throw an exception and leave the collection unmodified.

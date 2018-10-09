@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Condition;
 
 /**
  * Utilities for treating interruptible operations as uninterruptible. In all cases, if a thread is
@@ -93,6 +94,34 @@ public final class Uninterruptibles {
     }
   }
 
+  /**
+   * Invokes {@code condition.}{@link Condition#await(long, TimeUnit) await(timeout, unit)}
+   * uninterruptibly.
+   *
+   * @since 23.6
+   */
+  @GwtIncompatible // concurrency
+  public static boolean awaitUninterruptibly(Condition condition, long timeout, TimeUnit unit) {
+    boolean interrupted = false;
+    try {
+      long remainingNanos = unit.toNanos(timeout);
+      long end = System.nanoTime() + remainingNanos;
+
+      while (true) {
+        try {
+          return condition.await(remainingNanos, NANOSECONDS);
+        } catch (InterruptedException e) {
+          interrupted = true;
+          remainingNanos = end - System.nanoTime();
+        }
+      }
+    } finally {
+      if (interrupted) {
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
   /** Invokes {@code toJoin.}{@link Thread#join() join()} uninterruptibly. */
   @GwtIncompatible // concurrency
   public static void joinUninterruptibly(Thread toJoin) {
@@ -104,6 +133,34 @@ public final class Uninterruptibles {
           return;
         } catch (InterruptedException e) {
           interrupted = true;
+        }
+      }
+    } finally {
+      if (interrupted) {
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
+  /**
+   * Invokes {@code unit.}{@link TimeUnit#timedJoin(Thread, long) timedJoin(toJoin, timeout)}
+   * uninterruptibly.
+   */
+  @GwtIncompatible // concurrency
+  public static void joinUninterruptibly(Thread toJoin, long timeout, TimeUnit unit) {
+    Preconditions.checkNotNull(toJoin);
+    boolean interrupted = false;
+    try {
+      long remainingNanos = unit.toNanos(timeout);
+      long end = System.nanoTime() + remainingNanos;
+      while (true) {
+        try {
+          // TimeUnit.timedJoin() treats negative timeouts just like zero.
+          NANOSECONDS.timedJoin(toJoin, remainingNanos);
+          return;
+        } catch (InterruptedException e) {
+          interrupted = true;
+          remainingNanos = end - System.nanoTime();
         }
       }
     } finally {
@@ -179,34 +236,6 @@ public final class Uninterruptibles {
         try {
           // Future treats negative timeouts just like zero.
           return future.get(remainingNanos, NANOSECONDS);
-        } catch (InterruptedException e) {
-          interrupted = true;
-          remainingNanos = end - System.nanoTime();
-        }
-      }
-    } finally {
-      if (interrupted) {
-        Thread.currentThread().interrupt();
-      }
-    }
-  }
-
-  /**
-   * Invokes {@code unit.}{@link TimeUnit#timedJoin(Thread, long) timedJoin(toJoin, timeout)}
-   * uninterruptibly.
-   */
-  @GwtIncompatible // concurrency
-  public static void joinUninterruptibly(Thread toJoin, long timeout, TimeUnit unit) {
-    Preconditions.checkNotNull(toJoin);
-    boolean interrupted = false;
-    try {
-      long remainingNanos = unit.toNanos(timeout);
-      long end = System.nanoTime() + remainingNanos;
-      while (true) {
-        try {
-          // TimeUnit.timedJoin() treats negative timeouts just like zero.
-          NANOSECONDS.timedJoin(toJoin, remainingNanos);
-          return;
         } catch (InterruptedException e) {
           interrupted = true;
           remainingNanos = end - System.nanoTime();

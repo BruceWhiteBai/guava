@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Tester for {@code Spliterator} implementations. */
 @GwtCompatible

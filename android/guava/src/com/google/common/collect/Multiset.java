@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A collection that supports order-independent equality, like {@link Set}, but may have duplicate
@@ -101,7 +101,7 @@ public interface Multiset<E> extends Collection<E> {
    * @return the number of occurrences of the element in this multiset; possibly zero but never
    *     negative
    */
-  int count(@Nullable @CompatibleWith("E") Object element);
+  int count(@NullableDecl @CompatibleWith("E") Object element);
 
   // Bulk Operations
 
@@ -124,7 +124,30 @@ public interface Multiset<E> extends Collection<E> {
    *     return normally.
    */
   @CanIgnoreReturnValue
-  int add(@Nullable E element, int occurrences);
+  int add(@NullableDecl E element, int occurrences);
+
+  /**
+   * Adds a single occurrence of the specified element to this multiset.
+   *
+   * <p>This method refines {@link Collection#add}, which only <i>ensures</i> the presence of the
+   * element, to further specify that a successful call must always increment the count of the
+   * element, and the overall size of the collection, by one.
+   *
+   * <p>To both add the element and obtain the previous count of that element, use {@link
+   * #add(Object, int) add}{@code (element, 1)} instead.
+   *
+   * @param element the element to add one occurrence of; may be null only if explicitly allowed by
+   *     the implementation
+   * @return {@code true} always, since this call is required to modify the multiset, unlike other
+   *     {@link Collection} types
+   * @throws NullPointerException if {@code element} is null and this implementation does not permit
+   *     null elements
+   * @throws IllegalArgumentException if {@link Integer#MAX_VALUE} occurrences of {@code element}
+   *     are already contained in this multiset
+   */
+  @CanIgnoreReturnValue
+  @Override
+  boolean add(E element);
 
   /**
    * Removes a number of occurrences of the specified element from this multiset. If the multiset
@@ -139,7 +162,23 @@ public interface Multiset<E> extends Collection<E> {
    * @throws IllegalArgumentException if {@code occurrences} is negative
    */
   @CanIgnoreReturnValue
-  int remove(@Nullable @CompatibleWith("E") Object element, int occurrences);
+  int remove(@NullableDecl @CompatibleWith("E") Object element, int occurrences);
+
+  /**
+   * Removes a <i>single</i> occurrence of the specified element from this multiset, if present.
+   *
+   * <p>This method refines {@link Collection#remove} to further specify that it <b>may not</b>
+   * throw an exception in response to {@code element} being null or of the wrong type.
+   *
+   * <p>To both remove the element and obtain the previous count of that element, use {@link
+   * #remove(Object, int) remove}{@code (element, 1)} instead.
+   *
+   * @param element the element to remove one occurrence of
+   * @return {@code true} if an occurrence was found and removed
+   */
+  @CanIgnoreReturnValue
+  @Override
+  boolean remove(@NullableDecl Object element);
 
   /**
    * Adds or removes the necessary occurrences of an element such that the element attains the
@@ -289,7 +328,7 @@ public interface Multiset<E> extends Collection<E> {
    */
   @Override
   // TODO(kevinb): caveats about equivalence-relation?
-  boolean equals(@Nullable Object object);
+  boolean equals(@NullableDecl Object object);
 
   /**
    * Returns the hash code for this multiset. This is defined as the sum of
@@ -335,7 +374,7 @@ public interface Multiset<E> extends Collection<E> {
    * @return {@code true} if this multiset contains at least one occurrence of the element
    */
   @Override
-  boolean contains(@Nullable Object element);
+  boolean contains(@NullableDecl Object element);
 
   /**
    * Returns {@code true} if this multiset contains at least one occurrence of each element in the
@@ -356,45 +395,6 @@ public interface Multiset<E> extends Collection<E> {
    */
   @Override
   boolean containsAll(Collection<?> elements);
-
-  /**
-   * Adds a single occurrence of the specified element to this multiset.
-   *
-   * <p>This method refines {@link Collection#add}, which only <i>ensures</i> the presence of the
-   * element, to further specify that a successful call must always increment the count of the
-   * element, and the overall size of the collection, by one.
-   *
-   * <p>To both add the element and obtain the previous count of that element, use {@link
-   * #add(Object, int) add}{@code (element, 1)} instead.
-   *
-   * @param element the element to add one occurrence of; may be null only if explicitly allowed by
-   *     the implementation
-   * @return {@code true} always, since this call is required to modify the multiset, unlike other
-   *     {@link Collection} types
-   * @throws NullPointerException if {@code element} is null and this implementation does not permit
-   *     null elements
-   * @throws IllegalArgumentException if {@link Integer#MAX_VALUE} occurrences of {@code element}
-   *     are already contained in this multiset
-   */
-  @CanIgnoreReturnValue
-  @Override
-  boolean add(E element);
-
-  /**
-   * Removes a <i>single</i> occurrence of the specified element from this multiset, if present.
-   *
-   * <p>This method refines {@link Collection#remove} to further specify that it <b>may not</b>
-   * throw an exception in response to {@code element} being null or of the wrong type.
-   *
-   * <p>To both remove the element and obtain the previous count of that element, use {@link
-   * #remove(Object, int) remove}{@code (element, 1)} instead.
-   *
-   * @param element the element to remove one occurrence of
-   * @return {@code true} if an occurrence was found and removed
-   */
-  @CanIgnoreReturnValue
-  @Override
-  boolean remove(@Nullable Object element);
 
   /**
    * {@inheritDoc}

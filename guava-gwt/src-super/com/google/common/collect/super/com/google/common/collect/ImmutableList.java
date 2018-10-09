@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.stream.Collector;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * GWT emulated version of {@link com.google.common.collect.ImmutableList}. TODO(cpovirk): more doc

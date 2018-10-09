@@ -23,7 +23,7 @@ import static com.google.common.primitives.UnsignedInts.toLong;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import java.math.BigInteger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A wrapper class for unsigned {@code int} values, supporting arithmetic operations.

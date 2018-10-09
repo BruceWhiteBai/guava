@@ -25,7 +25,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A hash-based implementation of {@link ImmutableMap}.
@@ -129,17 +129,17 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 
   @SuppressWarnings("unchecked")
   @Override
-  @Nullable
-  public V get(@Nullable Object key) {
+  @NullableDecl
+  public V get(@NullableDecl Object key) {
     return (V) get(hashTable, alternatingKeysAndValues, size, 0, key);
   }
 
   static Object get(
-      @Nullable int[] hashTable,
-      @Nullable Object[] alternatingKeysAndValues,
+      @NullableDecl int[] hashTable,
+      @NullableDecl Object[] alternatingKeysAndValues,
       int size,
       int keyOffset,
-      @Nullable Object key) {
+      @NullableDecl Object key) {
     if (key == null) {
       return null;
     } else if (size == 1) {
@@ -182,6 +182,11 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     @Override
     public UnmodifiableIterator<Entry<K, V>> iterator() {
       return asList().iterator();
+    }
+
+    @Override
+    int copyIntoArray(Object[] dst, int offset) {
+      return asList().copyIntoArray(dst, offset);
     }
 
     @Override
@@ -282,12 +287,17 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     }
 
     @Override
+    int copyIntoArray(Object[] dst, int offset) {
+      return asList().copyIntoArray(dst, offset);
+    }
+
+    @Override
     public ImmutableList<K> asList() {
       return list;
     }
 
     @Override
-    public boolean contains(@Nullable Object object) {
+    public boolean contains(@NullableDecl Object object) {
       return map.get(object) != null;
     }
 

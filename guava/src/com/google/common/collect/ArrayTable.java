@@ -35,7 +35,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Fixed-size {@link Table} implementation backed by a two-dimensional array.
@@ -189,11 +190,9 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 
     abstract String getKeyRole();
 
-    @Nullable
-    abstract V getValue(int index);
+    abstract @Nullable V getValue(int index);
 
-    @Nullable
-    abstract V setValue(int index, V newValue);
+    abstract @Nullable V setValue(int index, V newValue);
 
     @Override
     public int size() {
@@ -622,7 +621,7 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
     return columnKeyToIndex.keySet();
   }
 
-  private transient ColumnMap columnMap;
+  private transient @MonotonicNonNull ColumnMap columnMap;
 
   @Override
   public Map<C, Map<R, V>> columnMap() {
@@ -710,7 +709,7 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
     return rowKeyToIndex.keySet();
   }
 
-  private transient RowMap rowMap;
+  private transient @MonotonicNonNull RowMap rowMap;
 
   @Override
   public Map<R, Map<C, V>> rowMap() {

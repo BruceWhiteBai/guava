@@ -42,9 +42,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Unit test for {@link FluentIterable}.

@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An immutable sorted set with one or more elements. TODO(jlevy): Consider separate class for a
@@ -48,6 +48,21 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
   RegularImmutableSortedSet(ImmutableList<E> elements, Comparator<? super E> comparator) {
     super(comparator);
     this.elements = elements;
+  }
+
+  @Override
+  Object[] internalArray() {
+    return elements.internalArray();
+  }
+
+  @Override
+  int internalArrayStart() {
+    return elements.internalArrayStart();
+  }
+
+  @Override
+  int internalArrayEnd() {
+    return elements.internalArrayEnd();
   }
 
   @Override

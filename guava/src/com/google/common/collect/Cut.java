@@ -20,7 +20,7 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.primitives.Booleans;
 import java.io.Serializable;
 import java.util.NoSuchElementException;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation detail for the internal structure of {@link Range} instances. Represents a unique
@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  */
 @GwtCompatible
 abstract class Cut<C extends Comparable> implements Comparable<Cut<C>>, Serializable {
-  final C endpoint;
+  final @Nullable C endpoint;
 
   Cut(@Nullable C endpoint) {
     this.endpoint = endpoint;

@@ -21,7 +21,7 @@ import com.google.common.base.Objects;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A collection which forwards all its method calls to another collection. Subclasses should

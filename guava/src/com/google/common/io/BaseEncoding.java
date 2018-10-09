@@ -34,7 +34,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A binary encoding scheme for reversibly translating between byte sequences and printable ASCII
@@ -566,7 +567,7 @@ public abstract class BaseEncoding {
     // TODO(lowasser): provide a useful toString
     final Alphabet alphabet;
 
-    @Nullable final Character paddingChar;
+    final @Nullable Character paddingChar;
 
     StandardBaseEncoding(String name, String alphabetChars, @Nullable Character paddingChar) {
       this(new Alphabet(name, alphabetChars.toCharArray()), paddingChar);
@@ -809,8 +810,8 @@ public abstract class BaseEncoding {
       return new SeparatedBaseEncoding(this, separator, afterEveryChars);
     }
 
-    private transient BaseEncoding upperCase;
-    private transient BaseEncoding lowerCase;
+    private transient @MonotonicNonNull BaseEncoding upperCase;
+    private transient @MonotonicNonNull BaseEncoding lowerCase;
 
     @Override
     public BaseEncoding upperCase() {
@@ -1016,12 +1017,12 @@ public abstract class BaseEncoding {
       }
 
       @Override
-      public Appendable append(CharSequence chars, int off, int len) throws IOException {
+      public Appendable append(@Nullable CharSequence chars, int off, int len) throws IOException {
         throw new UnsupportedOperationException();
       }
 
       @Override
-      public Appendable append(CharSequence chars) throws IOException {
+      public Appendable append(@Nullable CharSequence chars) throws IOException {
         throw new UnsupportedOperationException();
       }
     };

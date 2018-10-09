@@ -18,6 +18,9 @@ package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Methods factored out so that they can be emulated differently in GWT.
@@ -26,6 +29,48 @@ import java.lang.reflect.Array;
  */
 @GwtCompatible(emulated = true)
 final class Platform {
+  /** Returns the platform preferred implementation of a map based on a hash table. */
+  static <K, V> Map<K, V> newHashMapWithExpectedSize(int expectedSize) {
+    return Maps.newHashMapWithExpectedSize(expectedSize);
+  }
+
+  /**
+   * Returns the platform preferred implementation of an insertion ordered map based on a hash
+   * table.
+   */
+  static <K, V> Map<K, V> newLinkedHashMapWithExpectedSize(int expectedSize) {
+    return Maps.newLinkedHashMapWithExpectedSize(expectedSize);
+  }
+
+  /** Returns the platform preferred implementation of a set based on a hash table. */
+  static <E> Set<E> newHashSetWithExpectedSize(int expectedSize) {
+    return Sets.newHashSetWithExpectedSize(expectedSize);
+  }
+
+  /**
+   * Returns the platform preferred implementation of an insertion ordered set based on a hash
+   * table.
+   */
+  static <E> Set<E> newLinkedHashSetWithExpectedSize(int expectedSize) {
+    return Sets.newLinkedHashSetWithExpectedSize(expectedSize);
+  }
+
+  /**
+   * Returns the platform preferred map implementation that preserves insertion order when used only
+   * for insertions.
+   */
+  static <K, V> Map<K, V> preservesInsertionOrderOnPutsMap() {
+    return Maps.newLinkedHashMap();
+  }
+
+  /**
+   * Returns the platform preferred set implementation that preserves insertion order when used only
+   * for insertions.
+   */
+  static <E> Set<E> preservesInsertionOrderOnAddsSet() {
+    return Sets.newLinkedHashSet();
+  }
+
   /**
    * Returns a new array of the given length with the same type as a reference array.
    *
@@ -40,6 +85,11 @@ final class Platform {
     @SuppressWarnings("unchecked")
     T[] result = (T[]) Array.newInstance(type, length);
     return result;
+  }
+
+  /** Equivalent to Arrays.copyOfRange(source, from, to, arrayOfType.getClass()). */
+  static <T> T[] copy(Object[] source, int from, int to, T[] arrayOfType) {
+    return Arrays.copyOfRange(source, from, to, (Class<? extends T[]>) arrayOfType.getClass());
   }
 
   /**

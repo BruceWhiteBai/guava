@@ -35,7 +35,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A general-purpose bimap implementation using any two backing {@code Map} instances.
@@ -50,8 +51,8 @@ import javax.annotation.Nullable;
 abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
     implements BiMap<K, V>, Serializable {
 
-  private transient Map<K, V> delegate;
-  @RetainedWith transient AbstractBiMap<V, K> inverse;
+  private transient @MonotonicNonNull Map<K, V> delegate;
+  @MonotonicNonNull @RetainedWith transient AbstractBiMap<V, K> inverse;
 
   /** Package-private constructor for creating a map-backed bimap. */
   AbstractBiMap(Map<K, V> forward, Map<V, K> backward) {
@@ -210,7 +211,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
     return inverse;
   }
 
-  private transient Set<K> keySet;
+  private transient @MonotonicNonNull Set<K> keySet;
 
   @Override
   public Set<K> keySet() {
@@ -255,7 +256,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
     }
   }
 
-  private transient Set<V> valueSet;
+  private transient @MonotonicNonNull Set<V> valueSet;
 
   @Override
   public Set<V> values() {
@@ -297,7 +298,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
     }
   }
 
-  private transient Set<Entry<K, V>> entrySet;
+  private transient @MonotonicNonNull Set<Entry<K, V>> entrySet;
 
   @Override
   public Set<Entry<K, V>> entrySet() {
@@ -337,7 +338,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
   Iterator<Entry<K, V>> entrySetIterator() {
     final Iterator<Entry<K, V>> iterator = delegate.entrySet().iterator();
     return new Iterator<Entry<K, V>>() {
-      Entry<K, V> entry;
+      @Nullable Entry<K, V> entry;
 
       @Override
       public boolean hasNext() {
@@ -356,6 +357,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
         V value = entry.getValue();
         iterator.remove();
         removeFromInverseMap(value);
+        entry = null;
       }
     };
   }

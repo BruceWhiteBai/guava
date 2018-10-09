@@ -16,11 +16,11 @@ package com.google.common.base;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * Determines an output value based on an input value; a pre-Java-8 version of {@code
- * java.util.function.Function}.
+ * Determines an output value based on an input value; a pre-Java-8 version of {@link
+ * java.util.function.Function java.util.function.Function}.
  *
  * <p>The {@link Functions} class provides common functions and related utilities.
  *
@@ -59,9 +59,9 @@ public interface Function<F, T> {
    * @throws NullPointerException if {@code input} is null and this function does not accept null
    *     arguments
    */
-  @Nullable
   @CanIgnoreReturnValue // TODO(kevinb): remove this
-  T apply(@Nullable F input);
+  @NullableDecl
+  T apply(@NullableDecl F input);
 
   /**
    * <i>May</i> return {@code true} if {@code object} is a {@code Function} that behaves identically
@@ -75,5 +75,5 @@ public interface Function<F, T> {
    * disappear. It is best not to depend on it.
    */
   @Override
-  boolean equals(@Nullable Object object);
+  boolean equals(@NullableDecl Object object);
 }

@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Provides static utility methods for creating and working with {@link SortedMultiset} instances.
@@ -50,6 +50,11 @@ final class SortedMultisets {
     @Override
     final SortedMultiset<E> multiset() {
       return multiset;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+      return Multisets.elementIterator(multiset().entrySet().iterator());
     }
 
     @Override

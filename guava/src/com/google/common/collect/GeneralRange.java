@@ -23,7 +23,8 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Objects;
 import java.io.Serializable;
 import java.util.Comparator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A generalized interval on any ordering, for internal use. Supports {@code null}. Unlike {@link
@@ -91,10 +92,10 @@ final class GeneralRange<T> implements Serializable {
 
   private final Comparator<? super T> comparator;
   private final boolean hasLowerBound;
-  @Nullable private final T lowerEndpoint;
+  private final @Nullable T lowerEndpoint;
   private final BoundType lowerBoundType;
   private final boolean hasUpperBound;
-  @Nullable private final T upperEndpoint;
+  private final @Nullable T upperEndpoint;
   private final BoundType upperBoundType;
 
   private GeneralRange(
@@ -244,7 +245,7 @@ final class GeneralRange<T> implements Serializable {
         getUpperBoundType());
   }
 
-  private transient GeneralRange<T> reverse;
+  private transient @MonotonicNonNull GeneralRange<T> reverse;
 
   /** Returns the same range relative to the reversed comparator. */
   GeneralRange<T> reverse() {

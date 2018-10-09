@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of {@code Table} whose row keys and column keys are ordered by their natural
@@ -169,8 +169,8 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
   }
 
   private class TreeRow extends Row implements SortedMap<C, V> {
-    @Nullable final C lowerBound;
-    @Nullable final C upperBound;
+    final @Nullable C lowerBound;
+    final @Nullable C upperBound;
 
     TreeRow(R rowKey) {
       this(rowKey, null, null);
@@ -243,7 +243,7 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
       return backingRowMap().lastKey();
     }
 
-    transient SortedMap<C, V> wholeRow;
+    transient @Nullable SortedMap<C, V> wholeRow;
 
     /*
      * If the row was previously empty, we check if there's a new row here every
@@ -327,7 +327,7 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
             comparator);
 
     return new AbstractIterator<C>() {
-      C lastValue;
+      @Nullable C lastValue;
 
       @Override
       protected C computeNext() {

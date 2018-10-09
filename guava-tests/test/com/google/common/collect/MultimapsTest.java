@@ -51,6 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableSet;
 import java.util.Queue;
 import java.util.RandomAccess;
 import java.util.Set;
@@ -60,8 +61,8 @@ import java.util.TreeSet;
 import java.util.function.BiPredicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Unit test for {@code Multimaps}.
@@ -455,7 +456,6 @@ public class MultimapsTest extends TestCase {
     ListMultimap<String, Integer> listMultimap =
         new ImmutableListMultimap.Builder<String, Integer>().put("foo", 1).put("bar", 2).build();
     assertFalse("SetMultimap equals ListMultimap", multimapView.equals(listMultimap));
-    assertEquals(multimap.toString(), multimapView.toString());
     assertEquals(multimap.hashCode(), multimapView.hashCode());
     assertEquals(multimap.size(), multimapView.size());
     assertTrue(multimapView.containsKey("foo"));
@@ -671,6 +671,20 @@ public class MultimapsTest extends TestCase {
 
     assertFalse(multimap.keySet() instanceof SortedSet);
     assertFalse(multimap.asMap() instanceof SortedMap);
+  }
+
+  public void testNewMultimapValueCollectionMatchesNavigableSet() {
+    Supplier<TreeSet<Integer>> factory = new SortedSetSupplier();
+    Map<Color, Collection<Integer>> map = Maps.newEnumMap(Color.class);
+    Multimap<Color, Integer> multimap = Multimaps.newMultimap(map, factory);
+    assertTrue(multimap.get(Color.BLUE) instanceof NavigableSet);
+  }
+
+  public void testNewMultimapValueCollectionMatchesList() {
+    Supplier<LinkedList<Integer>> factory = new ListSupplier();
+    Map<Color, Collection<Integer>> map = Maps.newEnumMap(Color.class);
+    Multimap<Color, Integer> multimap = Multimaps.newMultimap(map, factory);
+    assertTrue(multimap.get(Color.BLUE) instanceof List);
   }
 
   @GwtIncompatible // SerializableTester

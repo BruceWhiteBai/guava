@@ -28,8 +28,8 @@ import java.lang.reflect.Method;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.annotation.Nullable;
 import junit.framework.AssertionFailedError;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A helper for concurrency testing. One or more {@code TestThread} instances are instantiated in a

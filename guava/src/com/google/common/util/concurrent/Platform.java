@@ -15,7 +15,7 @@
 package com.google.common.util.concurrent;
 
 import com.google.common.annotations.GwtCompatible;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Methods factored out so that they can be emulated differently in GWT. */
 @GwtCompatible(emulated = true)

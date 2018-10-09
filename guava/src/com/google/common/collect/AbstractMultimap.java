@@ -29,7 +29,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A skeleton {@code Multimap} implementation, not necessarily in terms of a {@code Map}.
@@ -107,7 +108,7 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
     return result;
   }
 
-  private transient Collection<Entry<K, V>> entries;
+  private transient @MonotonicNonNull Collection<Entry<K, V>> entries;
 
   @Override
   public Collection<Entry<K, V>> entries() {
@@ -115,16 +116,10 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
     return (result == null) ? entries = createEntries() : result;
   }
 
-  Collection<Entry<K, V>> createEntries() {
-    if (this instanceof SetMultimap) {
-      return new EntrySet();
-    } else {
-      return new Entries();
-    }
-  }
+  abstract Collection<Entry<K, V>> createEntries();
 
   @WeakOuter
-  private class Entries extends Multimaps.Entries<K, V> {
+  class Entries extends Multimaps.Entries<K, V> {
     @Override
     Multimap<K, V> multimap() {
       return AbstractMultimap.this;
@@ -142,7 +137,7 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
   }
 
   @WeakOuter
-  private class EntrySet extends Entries implements Set<Entry<K, V>> {
+  class EntrySet extends Entries implements Set<Entry<K, V>> {
     @Override
     public int hashCode() {
       return Sets.hashCodeImpl(this);
@@ -161,7 +156,7 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
         entryIterator(), size(), (this instanceof SetMultimap) ? Spliterator.DISTINCT : 0);
   }
 
-  private transient Set<K> keySet;
+  private transient @MonotonicNonNull Set<K> keySet;
 
   @Override
   public Set<K> keySet() {
@@ -169,11 +164,9 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
     return (result == null) ? keySet = createKeySet() : result;
   }
 
-  Set<K> createKeySet() {
-    return new Maps.KeySet<>(asMap());
-  }
+  abstract Set<K> createKeySet();
 
-  private transient Multiset<K> keys;
+  private transient @MonotonicNonNull Multiset<K> keys;
 
   @Override
   public Multiset<K> keys() {
@@ -181,11 +174,9 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
     return (result == null) ? keys = createKeys() : result;
   }
 
-  Multiset<K> createKeys() {
-    return new Multimaps.Keys<>(this);
-  }
+  abstract Multiset<K> createKeys();
 
-  private transient Collection<V> values;
+  private transient @MonotonicNonNull Collection<V> values;
 
   @Override
   public Collection<V> values() {
@@ -193,9 +184,7 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
     return (result == null) ? values = createValues() : result;
   }
 
-  Collection<V> createValues() {
-    return new Values();
-  }
+  abstract Collection<V> createValues();
 
   @WeakOuter
   class Values extends AbstractCollection<V> {
@@ -233,7 +222,7 @@ abstract class AbstractMultimap<K, V> implements Multimap<K, V> {
     return Spliterators.spliterator(valueIterator(), size(), 0);
   }
 
-  private transient Map<K, Collection<V>> asMap;
+  private transient @MonotonicNonNull Map<K, Collection<V>> asMap;
 
   @Override
   public Map<K, Collection<V>> asMap() {

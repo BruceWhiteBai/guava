@@ -49,10 +49,10 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import javax.annotation.Nullable;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Test suites for wrappers in {@code Maps}.

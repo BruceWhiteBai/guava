@@ -36,9 +36,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Unit tests for {@link ClassSanityTester}.
@@ -424,7 +424,7 @@ public class ClassSanityTesterTest extends TestCase {
   }
 
   public void testNoEqualsChecksOnAnnotation() throws Exception {
-    tester.testEquals(Nullable.class);
+    tester.testEquals(MyAnnotation.class);
   }
 
   public void testGoodNulls() throws Exception {
@@ -467,7 +467,7 @@ public class ClassSanityTesterTest extends TestCase {
   }
 
   public void testNoNullChecksOnAnnotation() throws Exception {
-    tester.testNulls(Nullable.class);
+    tester.testNulls(MyAnnotation.class);
   }
 
   public void testBadNulls() throws Exception {
@@ -534,7 +534,7 @@ public class ClassSanityTesterTest extends TestCase {
   }
 
   public void testInstantiate_annotation() throws Exception {
-    assertNull(tester.instantiate(Nullable.class));
+    assertNull(tester.instantiate(MyAnnotation.class));
   }
 
   public void testInstantiate_setDefault() throws Exception {
@@ -750,16 +750,16 @@ public class ClassSanityTesterTest extends TestCase {
       throw new RuntimeException();
     }
 
+    // Good!
+    static GoodEquals create(String a, int b) {
+      return new GoodEquals(a, b);
+    }
+
     // keep trying
     @SuppressWarnings("unused")
     @Nullable
     public static GoodEquals createMayReturnNull(int a, int b) {
       return null;
-    }
-
-    // Good!
-    static GoodEquals create(String a, int b) {
-      return new GoodEquals(a, b);
     }
 
     @Override
@@ -1359,4 +1359,6 @@ public class ClassSanityTesterTest extends TestCase {
       return "";
     }
   }
+
+  @interface MyAnnotation {}
 }

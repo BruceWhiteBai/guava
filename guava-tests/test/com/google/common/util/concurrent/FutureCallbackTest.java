@@ -24,8 +24,8 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
-import javax.annotation.Nullable;
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.mockito.Mockito;
 
 /**

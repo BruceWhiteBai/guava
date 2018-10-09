@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Provides static methods for working with {@code Collection} instances.
@@ -509,8 +509,7 @@ public final class Collections2 {
   }
 
   private static final class OrderedPermutationIterator<E> extends AbstractIterator<List<E>> {
-
-    List<E> nextPermutation;
+    @Nullable List<E> nextPermutation;
     final Comparator<? super E> comparator;
 
     OrderedPermutationIterator(List<E> list, Comparator<? super E> comparator) {

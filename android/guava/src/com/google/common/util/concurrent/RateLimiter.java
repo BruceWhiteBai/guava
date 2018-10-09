@@ -29,11 +29,15 @@ import com.google.common.util.concurrent.SmoothRateLimiter.SmoothWarmingUp;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
  * A rate limiter. Conceptually, a rate limiter distributes permits at a configurable rate. Each
  * {@link #acquire()} blocks if necessary until a permit is available, and then takes it. Once
  * acquired, permits need not be released.
+ *
+ * <p>{@code RateLimiter} is safe for concurrent use: It will restrict the total rate of calls from
+ * all threads. Note, however, that it does not guarantee fairness.
  *
  * <p>Rate limiters are often used to restrict the rate at which some physical or logical resource
  * is accessed. This is in contrast to {@link java.util.concurrent.Semaphore} which restricts the
@@ -80,8 +84,6 @@ import java.util.concurrent.TimeUnit;
  * of the <i>next</i> request. I.e., if an expensive task arrives at an idle RateLimiter, it will be
  * granted immediately, but it is the <i>next</i> request that will experience extra throttling,
  * thus paying for the cost of the expensive task.
- *
- * <p>Note: {@code RateLimiter} does not provide fairness guarantees.
  *
  * @author Dimitris Andreou
  * @since 13.0
@@ -181,7 +183,7 @@ public abstract class RateLimiter {
   private final SleepingStopwatch stopwatch;
 
   // Can't be initialized in the constructor because mocks don't call the constructor.
-  private volatile Object mutexDoNotUseDirectly;
+  @MonotonicNonNullDecl private volatile Object mutexDoNotUseDirectly;
 
   private Object mutex() {
     Object mutex = mutexDoNotUseDirectly;
@@ -404,7 +406,7 @@ public abstract class RateLimiter {
 
     protected abstract void sleepMicrosUninterruptibly(long micros);
 
-    public static final SleepingStopwatch createFromSystemTimer() {
+    public static SleepingStopwatch createFromSystemTimer() {
       return new SleepingStopwatch() {
         final Stopwatch stopwatch = Stopwatch.createStarted();
 

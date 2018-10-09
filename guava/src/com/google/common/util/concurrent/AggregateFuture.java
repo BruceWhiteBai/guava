@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A future made up of a collection of sub-futures.
@@ -44,7 +44,7 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
    * In certain circumstances, this field might theoretically not be visible to an afterDone() call
    * triggered by cancel(). For details, see the comments on the fields of TimeoutFuture.
    */
-  private RunningState runningState;
+  private @Nullable RunningState runningState;
 
   @Override
   protected final void afterDone() {
@@ -200,7 +200,7 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
     final void addInitialException(Set<Throwable> seen) {
       if (!isCancelled()) {
         // TODO(cpovirk): Think about whether we could/should use Verify to check this.
-        boolean unused = addCausalChain(seen, trustedGetException());
+        boolean unused = addCausalChain(seen, tryInternalFastPathGetFailure());
       }
     }
 

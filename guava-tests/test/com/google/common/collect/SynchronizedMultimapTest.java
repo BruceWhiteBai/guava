@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.RandomAccess;
 import java.util.Set;
-import javax.annotation.Nullable;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Tests for {@code Synchronized#multimap}.

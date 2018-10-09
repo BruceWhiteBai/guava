@@ -21,7 +21,8 @@ import com.google.j2objc.annotations.WeakOuter;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This class provides a skeletal implementation of the {@link SortedMultiset} interface.
@@ -115,7 +116,7 @@ abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements 
     return Multisets.iteratorImpl(descendingMultiset());
   }
 
-  private transient SortedMultiset<E> descendingMultiset;
+  private transient @MonotonicNonNull SortedMultiset<E> descendingMultiset;
 
   @Override
   public SortedMultiset<E> descendingMultiset() {

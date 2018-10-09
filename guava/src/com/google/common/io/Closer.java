@@ -27,7 +27,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link Closeable} that collects {@code Closeable} resources and closes them all when it is
@@ -105,7 +106,7 @@ public final class Closer implements Closeable {
 
   // only need space for 2 elements in most cases, so try to use the smallest array possible
   private final Deque<Closeable> stack = new ArrayDeque<>(4);
-  private Throwable thrown;
+  @MonotonicNonNull private Throwable thrown;
 
   @VisibleForTesting
   Closer(Suppressor suppressor) {

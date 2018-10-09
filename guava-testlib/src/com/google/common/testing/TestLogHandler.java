@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Tests may use this to intercept messages that are logged by the code under test. Example:
